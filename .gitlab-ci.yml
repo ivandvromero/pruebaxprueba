@@ -12,7 +12,7 @@ stages:
   - deploy_prod
 
 variables:
-  SERVICE_NAME: monitor-service
+  SERVICE_NAME: user-service
   EKS_NAMESPACE: default
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
   GIT_DEPTH: "0"
@@ -30,7 +30,7 @@ Test:
   tags:
     - dale-devops-gitlab-runner
   stage: test
-  allow_failure: true
+  allow_failure: false
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
@@ -50,7 +50,6 @@ sonarcloud-check:
   tags:
     - dale-devops-gitlab-runner
   stage: sonar
-  allow_failure: true
   dependencies:
     - Test
   rules:
@@ -90,7 +89,6 @@ build_image:
         docker rmi $CONTAINER_IMAGE:$VERSION
       fi
 
-
 push_image:
   tags:
     - dale-devops-gitlab-runner
@@ -121,13 +119,13 @@ push_image_release:
     - docker rmi $CONTAINER_IMAGE:$VERSION
     - docker rmi $CONTAINER_IMAGE:$RELEASE
 
-deploy_dev_monitor:
+deploy_dev_user:
   tags:
     - dale-devops-gitlab-runner
   stage: deploy_dev
   variables:
     APP_NAME: dale-dev-compute
-    SECRET_PATH: monitor-service/secret_config-raToIm
+    SECRET_PATH: user-service/secret_config-hnmyld
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
   script:
@@ -136,13 +134,13 @@ deploy_dev_monitor:
     - pip3 install awscli
     - bash .cicd/deploy-eks.sh dev $DEV_ACCOUNT_ID $AWS_DEFAULT_REGION $APP_NAME $EKS_NAMESPACE $SERVICE_NAME .cicd/helm $CONTAINER_IMAGE $VERSION $SECRET_PATH
 
-deploy_qa_monitor:
+deploy_qa_user:
   tags:
     - dale-devops-gitlab-runner
   stage: deploy_qa
   variables:
     APP_NAME: dale-qa-compute
-    SECRET_PATH: monitor-service/secret_config-3Oae0t
+    SECRET_PATH: user-service/secret_config-BPm5eW
   script:
     - echo "Deploy to qa server"
     - if [ -z "$TEMP1" ]; then echo "VERSION is empty"; VERSION="latest"; fi
@@ -155,13 +153,13 @@ deploy_qa_monitor:
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ "/^release/"
 
-deploy_stg_monitor:
+deploy_stg_user:
   tags:
     - dale-devops-gitlab-runner
   stage: deploy_stg
   variables:
     APP_NAME: dale-stg-compute
-    SECRET_PATH: monitor-service/secret_config-WyrivH
+    SECRET_PATH: user-service/secret_config-LeZsum
   script:
     - echo "Deploy to stg server"
     - if [ -z "$TEMP1" ]; then echo "VERSION is empty"; VERSION="latest"; fi
@@ -174,13 +172,13 @@ deploy_stg_monitor:
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ "/^release/"
 
-deploy_prod_monitor:
+deploy_prod_user:
   tags:
     - dale-devops-gitlab-runner
   stage: deploy_prod
   variables:
     APP_NAME: dale-prod-compute
-    SECRET_PATH: monitor-service/secret_config-wWP3v9
+    SECRET_PATH: user-service/secret_config-OIvbDs
   script:
     - echo "Deploy to prod server"
     - if [ -z "$TEMP1" ]; then echo "VERSION is empty"; VERSION="latest"; fi

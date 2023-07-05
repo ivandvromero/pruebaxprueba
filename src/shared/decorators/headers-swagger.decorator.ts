@@ -12,7 +12,7 @@ export function Headers() {
       name: 'ChannelId',
     }),
     ApiHeader({
-      required: true,
+      required: false,
       name: 'SessionId',
     }),
     ApiHeader({

@@ -5,8 +5,9 @@ import { DataTransformationModule } from '@dale/data-transformation-nestjs';
 import { KafkaHealthService } from '@dale/shared-nestjs/services/kafka/kafka-health.service';
 import { LoggerModule } from '@dale/logger-nestjs';
 import serviceConfiguration from '../../config/service-configuration';
-import { RedisHealthService } from '@dale/shared-nestjs/services/redis/redis-health-service';
 import { TerminusModule } from '@nestjs/terminus';
+import { DatabaseService } from '../../db/connection/connection.service';
+import { RedisHealthService } from '@dale/shared-nestjs/services/redis/redis-health-service';
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import { TerminusModule } from '@nestjs/terminus';
     TerminusModule,
   ],
   controllers: [ServiceConfigController, HealthController],
-  providers: [KafkaHealthService, RedisHealthService],
+  providers: [KafkaHealthService, DatabaseService, RedisHealthService],
 })
 export class ServiceModule {}

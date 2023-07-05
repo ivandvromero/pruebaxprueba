@@ -30,8 +30,7 @@ export class ServiceConfigController {
       {
         service: this.configService.get('service'),
         kafka: this.configService.get('kafka'),
-        redis: this.configService.get('redis'),
-        crm: this.configService.get('crm'),
+        database: this.configService.get('database'),
       },
       maskingConfig,
     );

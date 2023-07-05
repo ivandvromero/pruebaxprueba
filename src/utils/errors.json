@@ -1,0 +1,47 @@
+{
+  "apiErrors": [
+    { "Key": "MUS000", "Code": "MUS000", "Value": "Ocurrió un error interno." },
+    {
+      "Key": "EXPECTED__OR__AFTER_PROPERTY_VALUE_IN_JSON_AT_POSITION_",
+      "Code": "MUS001",
+      "Value": "Formato de json enviado incorrecto."
+    },
+    {
+      "Key": "BAD_CONTROL_CHARACTER_IN_STRING_LITERAL_IN_JSON_AT_POSITION_",
+      "Code": "MUS001",
+      "Value": "Formato de json enviado incorrecto."
+    },
+    {
+      "Key": "EXPECTED__AFTER_PROPERTY_NAME_IN_JSON_AT_POSITION_",
+      "Code": "MUS001",
+      "Value": "Formato de json enviado incorrecto."
+    },
+    {
+      "Key": "EXPECTED_PROPERTY_NAME_OR__IN_JSON_AT_POSITION_",
+      "Code": "MUS001",
+      "Value": "Formato de json enviado incorrecto."
+    },
+    {
+      "Key": "UNEXPECTED_TOKEN__\n___IS_NOT_VALID_JSON",
+      "Code": "MUS001",
+      "Value": "Formato de json enviado incorrecto."
+    },
+    {
+      "Key": "BAD_REQUEST_EXCEPTION",
+      "Code": "MUS002",
+      "Value": "Campos ingresados incorrectos."
+    }
+  ],
+  "userMsErrors": [
+    { "Key": "MUS003", "Value": "El numero de deposito no existe." },
+    { "Key": "MUS004", "Value": "El numero de celular no existe." },
+    {
+      "Key": "MUS005",
+      "Value": "En este momento tenemos algunas fallas, intente mas tarde."
+    },
+    { "Key": "MUS006", "Value": "El numero de documento no existe." },
+    { "Key": "MUS007", "Value": "El email no existe." },
+    { "Key": "MUS008", "Value": "No ingreso ningun parametro de busqueda." },
+    { "Key": "MUS009", "Value": "El id de usuario no existe." }
+  ]
+}

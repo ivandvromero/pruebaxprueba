@@ -8,7 +8,7 @@ export default () => ({
     node_env: process.env.NODE_ENV,
     type: process.env.SERVICE_TYPE,
     name: process.env.SERVICE_NAME,
-    port: process.env.MONITOR_SERVICE_PORT,
+    port: process.env.USER_SERVICE_PORT,
     cloud_service_provider: process.env.CLOUD_SERVICE_PROVIDER,
     auditable: process.env.ENABLE_AUDIT,
     disable_mask: process.env.DISABLE_MASK,
@@ -19,15 +19,6 @@ export default () => ({
     private_key: process.env.CERTIFICATE_PRIVATE_KEY,
     public_key: process.env.PUBLIC_CERTIFICATE,
   },
-  kafkapts: {
-    kafka_ssl: process.env.KAFKA_SSL_ENABLED_PTS,
-    kafka_url: process.env.KAFKA_URLS_PTS,
-    sasl_username: process.env.SASL_USERNAME_PTS,
-    sasl_password: process.env.SASL_PASSWORD_PTS,
-    retries: parseInt(process.env.KAFKA_RETRIES),
-    retry: process.env.KAFKA_RETRY_POLICY_PTS,
-    topic: process.env.KAFKA_TOPIC_PTS,
-  },
   kafka: {
     kafka_ssl: process.env.KAFKA_SSL_ENABLED,
     kafka_url: process.env.KAFKA_URLS,
@@ -35,37 +26,25 @@ export default () => ({
     sasl_password: process.env.SASL_PASSWORD,
     retry: process.env.KAFKA_RETRY_POLICY,
   },
-  redis: {
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-    tls_enable: process.env.REDIS_TLS_ENABLED,
-    auth_token: process.env.REDIS_AUTH_TOKEN,
-    ttl: parseInt(process.env.REDIS_TTL),
+  database: {
+    typeorm_host: process.env.TYPEORM_HOST,
+    typeorm_port: process.env.TYPEORM_PORT,
+    typeorm_tokenization_username: process.env.TYPEORM_USER_USERNAME,
+    typeorm_user_password: process.env.TYPEORM_USER_PASSWORD,
+    typeorm_user_database: process.env.TYPEORM_USER_DATABASE,
+    db_rotating_key: process.env.DB_ROTATING_KEY,
+    db_connection_refresh_minutes: process.env.DB_CONNECTION_REFRESH_MINUTES,
+    db_ssl_enabled: process.env.DB_SSL_ENABLED,
   },
-  crm: {
-    crm_service_url: process.env.CRM_SERVICE_URL,
-    user: process.env.CRM_USERNAME,
-    password: process.env.CRM_PASSWORD,
+  providers: {
+    enrollment_np_service: process.env.ENROLLMENT_NATURAL_PERSON_SERVICE_URL,
   },
-  sqs: {
-    queue_url: process.env.SQS_URL,
-  },
-  eventlog: {
-    event_log_version: process.env.EVENT_LOG_VERSION,
-    event_log_mnemonic: process.env.EVENT_LOG_MNEMONIC,
-    event_log_debitcode: process.env.EVENT_LOG_DEBITCODE,
-    event_log_creditcode: process.env.EVENT_LOG_CREDITCODE,
-    event_log_debitname: process.env.EVENT_LOG_DEBITNAME,
-    event_log_creditname: process.env.EVENT_LOG_CREDITNAME,
-    event_log_application: process.env.EVENT_LOG_APPLICATION,
-    event_log_channel: process.env.EVENT_LOG_CHANNEL,
-  },
-  card: {
-    card_service_url: process.env.CARD_SERVICE_URL,
+  max_attempts_topic: {
+    update_user_db: 3,
   },
 });
 
-export const maskingConfig = {
+export const maskingConfig: any = {
   kafka: {
     sasl_username: USER_ID,
     sasl_password: SENSITIVE,
@@ -73,12 +52,5 @@ export const maskingConfig = {
   database: {
     typeorm_tokenization_username: USER_ID,
     typeorm_user_password: SENSITIVE,
-  },
-  redis: {
-    auth_token: SENSITIVE,
-  },
-  crm: {
-    user: USER_ID,
-    password: SENSITIVE,
   },
 };

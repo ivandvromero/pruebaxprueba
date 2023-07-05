@@ -1,738 +1,470 @@
-import { AxiosError } from 'axios';
-import { HttpStatus } from '@nestjs/common';
-import { HeaderDTO } from '../src/shared/dto/header.dto';
-import { MessageEvent } from '../src/dto/content.dto';
-import { DetailtDeviceDataResponse } from '../src/providers/enrollment-natural-person/dto/device-response.dto';
-import { BaseTransform } from '../src/providers/context/provider-context';
-import type { RedisClientOptions } from 'redis';
-import * as redisStore from 'cache-manager-redis-store';
+import { SYSTEM_SOURCE } from '@dale/shared-nestjs/constants/error-sources';
+import {
+  DEFAULT_ERROR,
+  ENTITY_ALREADY_EXIST,
+  INVALID_PAYLOAD_ERROR,
+  ENTITY_DOES_NOT_EXIST,
+} from '@dale/shared-nestjs/constants/errors';
+import {
+  CustomException,
+  GlobalErrorObjectType,
+} from '@dale/shared-nestjs/custom-errors/custom-exception';
+import { v4 as uuidv4 } from 'uuid';
+import { IDNV_STATUS_PASSED } from '@dale/shared-nestjs/constants/status';
+import {
+  DEFAULT_REASON,
+  ENTITY_ALREADY_EXISTS_DETAIL,
+  ENTITY_ALREADY_EXISTS_REASON,
+  ErrorCodes,
+  USER_DOES_NOT_EXIST_DETAIL,
+  ErrorObjectType,
+  USER_DOES_NOT_EXIST_REASON,
+  UPDATE_VALUES_MISSING_REASON,
+  UPDATE_VALUES_MISSING_DETAIL,
+  DEFAULT_DETAIL,
+} from '@dale/shared-nestjs/constants/system-errors';
+import serviceConfiguration from '../src/config/service-configuration';
+import { User } from 'src/db/user/user.entity';
+
 import { KafkaContext } from '@nestjs/microservices';
-import { KafkaMessage } from '@nestjs/microservices/external/kafka.interface';
-import { DateInfo } from '../src/providers/dale/dto/dale-notification.dto';
+import { HeadersEvent } from 'src/shared/dto/events.dto';
+import { UserEventDto } from 'src/modules/user/dto/user.dto';
 
-export const ConfigurationGetEnrollmentDeviceByIdResponseDecrypt = {
-  data: {
-    device: {
-      deviceId: 'fec9a323-18f3-49tb-ad62-46c20de7a032',
-      deviceName: 'Mi Dispositivo',
-      deviceVersion: '48.48.78',
-      deviceAppInfo: 'Prueba',
-      deviceOperativeSystem: 'MiPC',
-    },
-  },
+export const mockUserId = uuidv4();
+export const mockUser = {
+  id: 'test-id',
+  email: 'test-email',
+  status: 'NEWLY_REGISTERED',
+  city: 'pereira',
+};
+export const mockUserDob = {
+  id: 'test-id',
+  email: 'test-email',
+  status: 'NEWLY_REGISTERED',
+  dob: '2023-01-10',
+  city: 'pereira',
 };
 
-export const dataRedisEncrypt =
-  'U2132dsfdsgsfdujYTFEFsdGVkX1+TXyMI5nKOv0ftV+Dnt/haf2NFzHs+z1k7HVztzy+ti13CK9TFOc8rq4cGkgSOQTFbj3YpnlDETd88z9lvjIx55mVBWL//QzexJsrU0vX68F7Q3uwtm6COcaF9OGgJCzFEhNbB1QenEcCDjEbreesXaJ+FXpalB/FdsauiSDP=';
-
-export const headers: HeaderDTO = {
-  TransactionId: '',
-  ChannelId: '',
-  SessionId: '',
-  Timestamp: new Date().toString(),
-  IpAddress: '',
-  Application: '',
-  ApiVersion: 0,
-};
-
-export const deviceFieldsTramaResponse = {
-  data: {
-    device: {
-      deviceId: 'fec9a323-18f3-49tb-ad62-46c20de7a032',
-      deviceName: 'Mi Dispositivo',
-      deviceVersion: '48.48.78',
-      deviceAppInfo: 'Prueba',
-      deviceOperativeSystem: 'MiPC',
-    },
-  },
-};
-
-export const deviceTramaResponse = {
-  Field_K7_0110: '49tbad6246c20de7a032',
-  Field_K7_0111: 'Mi Dispositivo',
-  Field_K7_0112: '48.48.78',
-  Field_K7_0113: '127.0.0.7',
-  Field_K7_0118: 'Prueba',
-  Field_K7_0119: 'MiPC',
-  Field_K7_0132: 3186779266,
-};
-
-export const id = 'fec9a323-18f3-49tb-ad62-46c20de7a032';
-
-export const externalExceptionResponse: AxiosError<DetailtDeviceDataResponse> =
+export const mockDepositByUser = [
   {
-    response: {
-      data: {
-        error: {
-          code: 'ENP071',
-          description: 'Problemas internos, intente mas tarde',
-        },
+    id: 'test-id',
+    email: 'test-email',
+    status: 'NEWLY_REGISTERED',
+    accountNumber: 'test-id',
+  },
+];
+
+export const addressMock = {
+  buildingNumber: 'mock',
+  street: 'mock',
+  town: 'mock',
+  postCode: 'mock',
+  country: 'mock',
+};
+
+export const enrollmentNpDataResponse = {
+  documentNumber: '51723568',
+  documentType: '1',
+  email: 'pepito@gmail.com',
+  expeditionDate: 'string',
+  firstName: 'PEPITO',
+  firstSurname: 'PEDRAZA',
+  gender: 1,
+  phonePrefix: '+57',
+  phoneNumber: '3115952184',
+  validationData: {
+    request: {
+      requestedAt: '2023-02-21T01:12:54',
+      responseCode: '14',
+      securityCode: 'U4ZBDBD',
+    },
+    userData: {
+      firstSurname: 'VILLEGAS',
+      fullName: 'VILLEGAS TORRES JUAN DAVID AUGUSTO',
+      name: 'JUAN DAVID AUGUSTO',
+      secondSurname: 'TORRES',
+      rut: 'false',
+      validated: 'true',
+      metadata: {
+        age: {},
+        demographicInfo: {},
       },
-      status: HttpStatus.FORBIDDEN,
-      statusText: 'OK',
-      headers: {},
-      config: {},
+      documentData: {
+        city: 'BARRANQUILLA',
+        department: 'ATLANTICO',
+        documentNumber: '00076710115',
+        expeditionDate: '1996-08-28',
+        status: '00',
+      },
     },
-    config: {},
-    isAxiosError: true,
-    toJSON: null,
-    name: '',
-    message: '',
-  };
+  },
+};
 
-export const internalServerExceptionResponse: AxiosError<DetailtDeviceDataResponse> =
-  {
-    response: {
-      data: {},
-      status: HttpStatus.FORBIDDEN,
-      statusText: 'OK',
-      headers: {},
-      config: {},
-    },
-    config: {},
-    isAxiosError: true,
-    toJSON: null,
-    name: '',
-    message: '',
-  };
+export const mockUserResponse = {
+  id: 'test-id',
+  email: 'test-email',
+  firstName: 'mock',
+  lastName: 'mock',
+  documentType: 2,
+  documentNumber: '123456',
+  phoneNumber: 'mock',
+  dob: '2023-01-10',
+  address: addressMock,
+  status: 'NEWLY_REGISTERED',
+  riskProfile: 'mock',
+  phoneNumberVerified: false,
+  personType: '1',
+  createAt: '2023-01-12T00:21:22.617Z',
+  createAtUTC: '2023-01-12T00:21:22.617Z',
+  updateAt: '2023-01-12T00:21:22.617Z',
+  updateAtUTC: '2023-01-12T00:21:22.617Z',
+  accountsNumber: ['000000123780'],
+};
 
-export const configurationGetUserByAccountNumberResponseDecrypt = {
-  data: {
-    id: 'fec9a323-18f3-49tb-ad62-46c20de7a032',
-    email: 'kamiilosky@yopmail.com',
-    firstName: 'Camila',
-    secondName: null,
-    firstSurname: '*',
-    secondSurname: null,
+export const mockDepositResponse = {
+  id: 1,
+  accountNumber: '000000123780',
+  status: 1,
+  updateAt: '2023-01-17T19:47:53.060Z',
+  updateAtUTC: '2023-01-17T19:47:53.060Z',
+  user: {
+    id: 'test-id',
+    email: 'test-email',
+    firstName: 'mock',
+    lastName: 'mock',
     documentType: 2,
-    documentNumber: '1245334567',
-    phoneNumber: '4708596340',
-    username: '*',
-    phonePrefix: '*',
-    dob: null,
-    address: {
-      buildingNumber: '12',
-      street: '1',
-      town: 'Env',
-      postCode: '54',
-      country: 'Colombia',
+    documentNumber: '123456',
+    phoneNumber: 'mock',
+    dob: '2023-01-10',
+    address: addressMock,
+    status: 'NEWLY_REGISTERED',
+    riskProfile: 'mock',
+    //trackingId: 'test-id',
+    phoneNumberVerified: false,
+    personType: '1',
+    createAt: '2023-01-12T00:21:22.617Z',
+    createAtUTC: '2023-01-12T00:21:22.617Z',
+    updateAt: '2023-01-12T00:21:22.617Z',
+    updateAtUTC: '2023-01-12T00:21:22.617Z',
+  },
+};
+
+export const mockUserServiceResponse = {
+  id: 'test-id',
+  email: 'test-email',
+  firstName: 'mock',
+  lastName: 'mock',
+  documentType: 2,
+  documentNumber: '123456',
+  phoneNumber: 'mock',
+  accountsNumber: ['000000123780'],
+  dob: '2023-01-10',
+  address: addressMock,
+  status: 'NEWLY_REGISTERED',
+  riskProfile: 'mock',
+  //trackingId: 'test-id',
+  phoneNumberVerified: false,
+  personType: '1',
+  createAt: '2023-01-12T00:21:22.617Z',
+  createAtUTC: '2023-01-12T00:21:22.617Z',
+  updateAt: '2023-01-12T00:21:22.617Z',
+  updateAtUTC: '2023-01-12T00:21:22.617Z',
+};
+
+export const mockUpdateUserNew = {
+  email: 'test-email',
+  firstName: 'test-name',
+  lastName: 'mock',
+  phoneNumber: 'mock',
+  dob: new Date('2023-01-10'),
+  address: addressMock,
+  status: 'NEWLY_REGISTERED',
+  riskProfile: 'mock',
+  trackingId: 'mock',
+  phoneNumberVerified: false,
+};
+
+export const UpdatePhoneNumberMock = {
+  userId: 'test-id',
+  phoneNumber: 'mock',
+  trackingId: 'mock',
+};
+
+export const UpdateDeviceMock = {
+  userId: 'test-id',
+  deviceId: 'mock',
+  trackingId: 'mock',
+};
+
+export const UpdatePhoneNumberResponseMock = {
+  requestId: 'mock',
+};
+
+export const AddUserDepositMock = {
+  userId: 'test-id',
+  accountNumber: 'mock',
+  trackingId: 'mock',
+};
+
+export const mockUserFavorite = {
+  id: '5e063e90-4c31-410a-b239-a46272685d48',
+  userId: '882744c6-6cf2-4de3-aacd-22d69310240d',
+  favoriteAlias: 'dev',
+  phoneNumber: '3103230824',
+};
+export const mockUserFavoriteQuery = {
+  where: {
+    userId: '882744c6-6cf2-4de3-aacd-22d69310240d',
+    favoriteAlias: 'dev',
+    phoneNumber: '3103230824',
+  },
+};
+
+export const mockUserFavoriteCreate = {
+  id: '5e063e90-4c31-410a-b239-a46272685d47',
+  userId: '882744c6-6cf2-4de3-aacd-22d69310240d',
+  favoriteAlias: 'dev',
+  phoneNumber: '3103230824',
+};
+
+export const mockQueryFavorite = `
+    (SELECT "Favorite"."id", "Favorite"."user_id" AS "userId", "Favorite"."favorite_alias" AS "favoriteAlias",
+    "Favorite"."phone_number" AS "phoneNumber"
+    FROM "favorites"  "Favorite"
+    WHERE ("Favorite"."user_id" = '882744c6-6cf2-4de3-aacd-22d69310240d')
+    AND "Favorite"."favorite_alias" ILIKE '%%')
+    UNION
+    (SELECT "Favorite"."id", "Favorite"."user_id" AS "userId", "Favorite"."favorite_alias" AS "favoriteAlias",
+    "Favorite"."phone_number" AS "phoneNumber"
+    FROM "favorites"  "Favorite"
+    WHERE ("Favorite"."user_id" = '882744c6-6cf2-4de3-aacd-22d69310240d')
+    AND "Favorite"."phone_number" ILIKE '%%')
+    ORDER BY "favoriteAlias" ASC
+    LIMIT 1 OFFSET 0`;
+
+export const mockUserFavoriteSuccessDeleted = {
+  data: {
+    code: 'MUS008',
+    message: 'Hemos eliminado este contacto de tus favoritos.',
+  },
+  error: null,
+};
+export const mockUserFavoriteFailedDeleted = {
+  affected: 1,
+};
+export const mockUserFavoriteFailedNoExitDeleted = {
+  data: null,
+  error: {
+    code: 'ACS000',
+    message: 'Favorito no existe',
+  },
+};
+export const mockTestUserRegistered: User = {
+  id: 'test-id',
+  email: 'test-email',
+  documentNumber: '11111111111',
+  documentType: '1',
+  firstName: 'Mockarlos',
+  secondName: 'Mockevin',
+  username: '3115952184',
+  firstSurname: 'Mocklina',
+  secondSurname: 'Anselmock',
+  phoneNumber: '3115952184',
+  phonePrefix: '57',
+  externalId: '300000003263806',
+  externalNumber: '52228',
+  bPartnerId: '2',
+  enrollmentId: '4352f9e5-525d-47dd-99a3-6b9d8ed1fe88',
+  deviceId: '12345abcdef',
+  gender: 1,
+  userGender: 2,
+};
+export const mockEventMessage = {
+  userId: 'test-id',
+  idnvStatus: 'KYC_CHECKS_PASSED',
+  riskProfile: 'risk-profile-low',
+  trackingId: 'test-tracking-id',
+};
+export const mockUserDoesNotExistsError: ErrorObjectType = {
+  source: serviceConfiguration().service.name,
+  code: ErrorCodes.USER_DOES_NOT_EXIST_CODE,
+  reason: USER_DOES_NOT_EXIST_REASON,
+  details: USER_DOES_NOT_EXIST_DETAIL,
+};
+export const mockErrorUserNotExist400 = {
+  message: ENTITY_DOES_NOT_EXIST,
+  statusCode: 400,
+  errors: [mockUserDoesNotExistsError],
+};
+export const mockErrorUserNotExist404 = {
+  message: ENTITY_DOES_NOT_EXIST,
+  statusCode: 404,
+  errors: [mockUserDoesNotExistsError],
+};
+export const mockTestEmail = {
+  email: 'test-email',
+};
+export const mockUpdateUser = {
+  email: 'test-email',
+  firstName: 'test-name',
+  trackingId: 'test-tracking-id',
+};
+export const mockErrorCode = {
+  code: '23505',
+};
+
+export const mockScreeningCheck = {
+  userId: '',
+  searchId: '532985782',
+  matchStatus: 'no_match',
+  riskLevel: 'unknown',
+};
+export const mockEntityAlreadyExistsError: ErrorObjectType = {
+  source: SYSTEM_SOURCE,
+  code: ErrorCodes.ENTITY_ALREADY_EXISTS_CODE,
+  reason: ENTITY_ALREADY_EXISTS_REASON,
+  details: ENTITY_ALREADY_EXISTS_DETAIL,
+};
+export const mockExpectedErrorObject409: GlobalErrorObjectType = {
+  message: ENTITY_ALREADY_EXIST,
+  statusCode: 409,
+  errors: [mockEntityAlreadyExistsError],
+};
+
+export const mockExceptionError: GlobalErrorObjectType = {
+  message: 'test-error',
+  statusCode: 500,
+  errors: [
+    {
+      code: ErrorCodes.DEFAULT_CODE,
+      reason: DEFAULT_REASON,
+      source: '',
+      details: USER_DOES_NOT_EXIST_DETAIL,
     },
-    status: 'ACTIVE',
-    riskProfile: null,
-    personType: 1,
-    externalId: 52183,
-    externalNumber: '*',
-    bPartnerId: '*',
-    enrollmentId: '4a43eewd-fd2e-44d6-a459-bce127a1hd77',
-    createAt: '2023-02-23T00:44:10.427Z',
-    createAtUTC: '2023-02-23T00:44:10.427Z',
-    updateAt: '2023-02-23T00:47:34.315Z',
-    updateAtUTC: '2023-02-23T00:44:10.427Z',
-    accountsNumber: ['01420123730'],
-  },
+  ],
+};
+export const mockException = new CustomException(mockExceptionError);
+export const mockMaskedUserId = 'mock-masked-value-for-user-id';
+export const mockTrackingId = 'mock-id';
+export const mockError = new Error('test-error');
+export const mockDefaultError: ErrorObjectType = {
+  source: SYSTEM_SOURCE,
+  code: ErrorCodes.DEFAULT_CODE,
+  reason: DEFAULT_REASON,
+  details: DEFAULT_DETAIL,
+};
+export const mockExpectedErrorObject500: GlobalErrorObjectType = {
+  message: DEFAULT_ERROR,
+  statusCode: 500,
+  errors: [mockDefaultError],
 };
 
-export const crmGetClient = {
-  data: {
-    PartyId: 123,
-    PartyNumber: '52183',
-    SalesProfileNumber: '123',
-    SalesProfileStatus: 'ACTIVO',
-    CurrencyCode: 'test',
-    PartyStatus: 'test',
-    CreatedBy: 'test',
-    PartyType: 'test',
-    CreationDate: '2023-02-21T19:46:36.001+00:00',
-    LastUpdateDate: '2023-02-21T19:46:40.006+00:00',
-    ContactName: 'test',
-    MobileNumber: '123',
-    FormattedWorkPhoneNumber: '123',
-    RawWorkPhoneNumber: '123',
-    EmailAddress: 'test@test.com',
-    PrimaryAddressId: 123,
-    PartyNumberKey: '123',
-    SellToPartySiteId: 123,
-    AddressNumber: '123',
-    Country: 'CO',
-    WorkPhoneContactPtId: '123',
-    PersonDEO_dl_tipo_identificacion_c: 'CC',
-    PersonDEO_dl_numero_identificacion_c: 'test',
-    PersonDEO_dl_genero_c: 'test',
-    PersonDEO_dl_fecha_expedicion_c: '2000-08-28',
-    PersonDEO_dl_identificadfor_dale_1_c: '123',
-    PersonDEO_dl_tipo_enrrolamiento_c: 'ordinario',
-    links: [
-      {
-        rel: 'child',
-        href: 'https://crm/crmRestApi/resources/1/child/PersonDEO_Deposito_c',
-        name: 'PersonDEO_DepositosCollection_c',
-        kind: 'collection',
-      },
-    ],
-  },
+export const mockEntityUpdateValuesMissingError: ErrorObjectType = {
+  source: SYSTEM_SOURCE,
+  code: ErrorCodes.UPDATE_VALUES_MISSING_CODE,
+  reason: UPDATE_VALUES_MISSING_REASON,
+  details: UPDATE_VALUES_MISSING_DETAIL,
+};
+export const mockExpectedErrorObject400: GlobalErrorObjectType = {
+  message: INVALID_PAYLOAD_ERROR,
+  statusCode: 400,
+  errors: [mockEntityUpdateValuesMissingError],
+};
+export const mockStatusMessage = {
+  userId: mockUserId,
+  idnvStatus: IDNV_STATUS_PASSED,
+  riskProfile: 'risk_profile_low',
+  trackingId: 'abc',
+};
+export const mockUserStatus = {
+  id: mockUserId,
+  email: 'my-test-email-for-kafka@example.com',
 };
 
-export const crmGetProduct = {
-  data: {
-    items: [
-      {
-        Id: 123,
-        CreatedBy: 'test',
-        CreationDate: '2023-02-10',
-        LastUpdateDate: '2023-02-10',
-        RecordNumber: '123',
-        PersonProfile_Id_c: 123,
-        dl_estado_deposito_c: 'ACTIVO',
-        dl_id_cliente_c: 'test',
-        dl_no_deposito_c: '1234',
-        links: [],
-      },
-    ],
-    count: 1,
-    hasMore: false,
-    limit: 0,
-    offset: 0,
-    links: [],
-  },
-};
-export const externalId = '52183';
-
-export const accountNumber = '000000123780';
-
-export const getUserErrorResponse = {
-  data: {
-    error: {
-      code: 'MUS003',
-      message: 'Usuario no encontrado',
-    },
-  },
-  headers: {},
-  config: {},
-  status: 200,
-  statusText: 'OK',
-};
-
-export const getClientErrorResponse = {
-  code: 'MUS003',
-  message: 'Cliente no encontrado',
-};
-
-export const getProductErrorResponse = {
-  code: 'MUS003',
-  message: 'Producto no encontrado',
+export const mockUpdatePhoneNumberPayload = {
+  userId: mockUserId,
+  phoneNumber: '+919999999999',
+  trackingId: mockTrackingId,
 };
 
 export const mockCheckResultSuccess = {
-  kafka: {
-    kafkaConnection: true,
-    message: 'Kafka ok',
-  },
-  kafkaPts: {
-    kafkaPtsConnection: true,
-    message: 'Kafka PTS ok',
-  },
-  redis: {
-    redisConnection: true,
-    message: 'Redis ok',
-  },
-};
-export const mockCheckResultFailure = {
-  kafka: {
-    kafkaConnection: false,
-  },
-  kafkaPts: {
-    kafkaPtsConnection: false,
-  },
-  redis: {
-    redisConnection: 'Connection is closed.',
-  },
-};
-export const mockEventObject: MessageEvent = {
-  Offset: '13',
-  MSG_ID: '01',
-  RQ: {
-    messageRQ: {
-      digitalService: 'INT_TRAN_DO_DALE2',
-      bankId: '123',
-      orderer: {
-        additionals: {
-          ipAddress: '127.0.0.3',
-          cus: 'TESTCUS',
-        },
-      },
-      beneficiaries: [
-        {
-          account: {
-            othersId: {
-              identificationType: 'BANCO1',
-              identificationId: '0000008',
-            },
-          },
-        },
-      ],
-      additionals: {
-        ipAddress: '127.0.0.1',
-        cus: 'TESTCUS',
-        beneficiaryDetails: {
-          beneficiaryAccount: '0000000023',
-          beneficiaryBankId: '0001',
-        },
-      },
-    },
-    securityRQ: {
-      hostId: '127.0.0.7',
-    },
-  },
-  CFO: {
-    general: {
-      transactionAmount: 60000,
-      transactionType: 'INT_TRAN_DO_DALE2_PTS_TRANSFER_DO-IT-SCUR',
-      transactionDetails: 'Prueba',
-    },
-    orderer: {
-      account: {
-        legacyId: {
-          accountNumber: '000001',
-          accountType: '01',
-        },
-        othersId: {
-          identificationId: '2000000',
-        },
-      },
-      additionals: {
-        ordererBP: {
-          name: 'Jhoon',
-          secondName: '',
-          lastName: 'Doe',
-          cellPhone: '318-677-9266',
-          phone: '318-677-9266',
-          externalId: '52',
-        },
-      },
-    },
-    beneficiaries: [
-      {
-        account: {
-          legacyId: {
-            accountNumber: '',
-            accountType: '0',
-          },
-          othersId: {
-            identificationId: '2000000',
-          },
-        },
-        additionals: {
-          beneficiary: {
-            BP: {
-              name: 'Ann',
-              secondName: '',
-              lastName: 'Doe',
-              cellPhone: '3333333333',
-              phone: '3333333333',
-              externalId: '53',
-            },
-          },
-        },
-      },
-    ],
-    additionals: {
-      userCustomMessage: 'message test',
-      sourceDetails: {
-        sourceAccount: 'accountID',
-      },
-      beneficiaryDetails: {
-        beneficiaryAccount: 'beneficiaryAccount',
-        beneficiaryBankId: '123',
-      },
-    },
-  },
-  RS: {
-    headerRS: {
-      msgId: 'b59a145f-28ed-4652-8b2d-bf79606ebc60',
-      msgIdOrg: 'TranDaleD2_ST',
-      timestamp: '2023-03-04T19:37:02Z',
-    },
-    statusRS: {
-      code: '0',
-      description: 'TRANSACCION EXITOSA',
-    },
-    messageRS: {
-      responses: [
-        {
-          PTSId: 'P0',
-          additionals: {
-            sourceDetails: {
-              sourceAccount: '0000011',
-              sourceBankId: '0001',
-            },
-            S125_REF2: '000000000000000000000',
-            S125_REF3: '                         ',
-            S125_IDREG: '00000048',
-            S125_TD1: '00',
-            S125_DOC1: '000000111506445',
-            S125_TD2: '00',
-            S125_DOC2: '000043045245250',
-            S125_VALTIT: '0',
-            S125_TERMD: '09632',
-          },
-          confirmations: [
-            {
-              data: {
-                id: '5054',
-                creationDate: '2023-03-14T14:37:01-05:00',
-                amount: -60005.05,
-                accountBalances: {
-                  totalBalance: 2663802.69,
-                },
-                transactionDetails: {
-                  transactionChannelKey: '8a44565283f5db280183f68aec5e486d',
-                  transactionChannelId: 'COU0003',
-                },
-              },
-            },
-            {
-              data: {
-                id: '5055',
-                creationDate: '2023-03-14T14:37:01-05:00',
-                amount: -10,
-                accountBalances: {
-                  totalBalance: 2663792.69,
-                },
-                transactionDetails: {
-                  transactionChannelKey: '8a44565283f5db280183f68aec5e486d',
-                  transactionChannelId: 'COU0003',
-                },
-              },
-            },
-            {
-              data: {
-                id: '5056',
-                creationDate: '2023-03-14T14:37:01-05:00',
-                amount: -1.9,
-                accountBalances: {
-                  totalBalance: 2663790.79,
-                },
-                transactionDetails: {
-                  transactionChannelKey: '8a44565283f5db280183f68aec5e486d',
-                  transactionChannelId: 'COU0003',
-                },
-              },
-            },
-            {
-              data: {
-                id: '5057',
-                creationDate: '2023-03-14T14:37:02-05:00',
-                amount: 60005.05,
-                accountBalances: {
-                  totalBalance: 248857.16,
-                },
-                transactionDetails: {
-                  transactionChannelKey: '8a44565283f5db280183f68aec5e486d',
-                  transactionChannelId: 'COU0003',
-                },
-              },
-            },
-          ],
-        },
-      ],
-    },
-  },
-};
-export const mockEventObjectReverseOrdinal = {
-  ordinal: '120',
-  operation:
-    'INT_TRAN_DO_D2D1_PTS_TRANSFER_DO-IT-SCUR.TRANSFERENCIA_INTERNA.REVERSE_VAT4',
-  postingId: '2b00000-0000-0000-0000-aaaaaaaaaaaa',
-  confirmationNumber: '45394',
-  data: {
-    encodedKey: '888888888888888888888888888',
-    id: '45394',
-    paymentOrderId: '19634',
-    creationDate: '2023-05-31T10:24:23-05:00',
-    valueDate: '2023-05-31T10:24:23-05:00',
-    bookingDate: '2023-05-31T10:24:23-05:00',
-    notes:
-      'Prueba receptor bloqueado  Canal~IVA1001R~Cuenta Ord.~2000376~ Cuenta Ben.~000000126465 ~Sujeto ~ORDERER~ Concepto ~TAX~App_Mobile_IN-888888888888888888888888888-20230531',
-    parentAccountKey: '888888888888888888888888888',
-    type: 'DEPOSIT',
-    amount: 4.75,
-    currencyCode: 'COP',
-    affectedAmounts: {
-      fundsAmount: 4.75,
-      interestAmount: 0,
-      feesAmount: 0,
-      overdraftAmount: 0,
-      overdraftFeesAmount: 0,
-      overdraftInterestAmount: 0,
-      technicalOverdraftAmount: 0,
-      technicalOverdraftInterestAmount: 0,
-      fractionAmount: 0,
-    },
-    taxes: {},
-    accountBalances: {
-      totalBalance: 328201.96,
-    },
-    userKey: '888888888888888888888888888',
-    terms: {
-      interestSettings: {},
-      overdraftInterestSettings: {},
-      overdraftSettings: {},
-    },
-    transactionDetails: {
-      transactionChannelKey: '888888888888888888888888888',
-      transactionChannelId: 'IVA1001R',
-    },
-    transferDetails: {},
-    fees: [],
-    _additionalDetails: {
-      linkedTransactionId: '19634',
-    },
-  },
-  roundId: '1',
-  responseType: 'ONLINE',
-  errorCode: '0',
-};
-export const mockGetHead = {
-  Field_90001: 'MFI-K7-002',
-  Field_BYTEI: 'ByteI',
-  Field_CONSTANN: 'N',
-  Field_SISTEMINUTE: 37,
-  Field_VWJEFECHAA: 2023,
-  Field_VWJEFECHAD: 14,
-  Field_VWJEFECHAM: 3,
-  Field_VWJEHORA: 14,
-  Field_VWJETECOD: '08647',
-  Field_VWJEUSER: 'K7',
-};
-export const mockGetClientOrigin = {
-  clientOrigin: {
-    Field_K7_0001: '123',
-    Field_K7_0002: 'N',
-    Field_K7_0003: 'CC',
-    Field_K7_0004: 'test',
-    Field_K7_0005: 'test',
-    Field_K7_0006: 'test@test.com',
-    Field_K7_0007: '123',
-    Field_K7_0008: '',
-    Field_K7_0009: 20230221,
-    Field_K7_0010: 0,
-    Field_K7_0011: 20000828,
-    Field_K7_0012: '00',
-    Field_K7_0013: '01',
-    Field_K7_0014: 'CO',
-    Field_K7_0015: '',
-    Field_K7_0016: '',
-    Field_K7_0017: '',
-    Field_K7_0018: '5',
-    Field_K7_0019: 20230221,
-    Field_K7_0020: 20230221,
-    Field_K7_0021: 0,
-    Field_K7_0022: 0,
-    Field_K7_0023: 0,
-    Field_K7_0024: 0,
-    Field_K7_0025: '',
-    Field_K7_0026: '',
-    Field_K7_0027: 't',
-    Field_K7_0028: 0,
-    Field_K7_0029: '',
-    Field_K7_0030: '',
-  },
-  links: [
-    {
-      rel: 'child',
-      href: 'https://crm/crmRestApi/resources/1/child/PersonDEO_Deposito_c',
-      name: 'PersonDEO_DepositosCollection_c',
-      kind: 'collection',
-    },
-  ],
-  tipo_enrrolamiento: '02',
-};
-export const mockGetClientDestination = {
-  clientDestination: {
-    Field_K7_0031: '123',
-    Field_K7_0032: 'CC',
-    Field_K7_0033: 'test',
-    Field_K7_0034: 'test',
-    Field_K7_0035: 'test@test.com',
-    Field_K7_0036: '123',
-    Field_K7_0037: '',
-    Field_K7_0038: 20230221,
-    Field_K7_0039: 0,
-    Field_K7_0040: 20000828,
-    Field_K7_0041: '00',
-    Field_K7_0042: '01',
-    Field_K7_0043: 'CO',
-    Field_K7_0044: '',
-    Field_K7_0045: '',
-    Field_K7_0046: '',
-    Field_K7_0047: '5',
-    Field_K7_0048: 20230221,
-    Field_K7_0049: 20230221,
-    Field_K7_0050: 0,
-    Field_K7_0051: 0,
-    Field_K7_0052: 0,
-    Field_K7_0053: 0,
-    Field_K7_0054: '',
-    Field_K7_0055: '',
-    Field_K7_0056: 't',
-    Field_K7_0057: 0,
-    Field_K7_0058: '',
-    Field_K7_0059: '',
-  },
-  links: [],
-  tipo_enrrolamiento: '02',
-};
-export const mockGetProductOrigin = {
-  productOrigin: {
-    Field_K7_0060: 'DE2',
-    Field_K7_0061: '',
-    Field_K7_0062: '02',
-    Field_K7_0063: '172002',
-    Field_K7_0064: '2000000',
-    Field_K7_0065: 20230210,
-    Field_K7_0066: 2663802.69,
-    Field_K7_0067: '5',
-    Field_K7_0068: '',
-    Field_K7_0069: 0,
-    Field_K7_0070: 'CO',
-    Field_K7_0071: 0,
-  },
-};
-export const mockGetProductDestination = {
-  productDestination: {
-    Field_K7_0072: 'DE2',
-    Field_K7_0073: '',
-    Field_K7_0074: '02',
-    Field_K7_0075: '172002',
-    Field_K7_0076: '3333333333',
-    Field_K7_0077: 20230210,
-    Field_K7_0078: 248857.16,
-    Field_K7_0079: '5',
-    Field_K7_0080: '',
-    Field_K7_0081: 0,
-    Field_K7_0082: 'CO',
-    Field_K7_0083: 0,
-  },
-};
-export const crmGetClientDestination = {
-  data: {
-    PartyId: 123,
-    Type: 'test',
-    SalesProfileStatus: 'ACTIVO',
-    CreationDate: '2023-02-21T19:46:36.001+00:00',
-    LastUpdateDate: '2023-02-21T19:46:40.006+00:00',
-    EmailAddress: 'test@test.com',
-    Country: 'CO',
-    ContactName: 'test',
-    MobileNumber: '123',
-    PersonDEO_dl_tipo_identificacion_c: 'CC',
-    PersonDEO_dl_numero_identificacion_c: 'test',
-    PersonDEO_dl_genero_c: 'test',
-    PersonDEO_dl_fecha_expedicion_c: '2000-08-28',
-    PersonDEO_dl_identificadfor_dale_1_c: '123',
-    PersonDEO_dl_tipo_enrrolamiento_c: 'ordinario',
-    links: [],
-    PartyType: 'test',
-  },
-};
-export const mockGetTransaction = {
-  Field_K7_0084: '',
-  Field_K7_0085: '',
-  Field_K7_0086: '',
-  Field_K7_0087: 20230314,
-  Field_K7_0088: 20230315,
-  Field_K7_0089: 193701,
-  Field_K7_0090: 'P0',
-  Field_K7_0091: '',
-  Field_K7_0092: '',
-  Field_K7_0093: 'COP',
-  Field_K7_0094: 60000,
-  Field_K7_0095: 'COP',
-  Field_K7_0096: 60000,
-  Field_K7_0097: 60000,
-  Field_K7_0098: 'AP',
-  Field_K7_0099: 'E',
-  Field_K7_0100: '10',
-  Field_K7_0101: 'Exitoso',
-  Field_K7_0102: 'N',
-  Field_K7_0103: 'CO',
-  Field_K7_0104: '',
-  Field_K7_0105: '',
-  Field_K7_0106: '',
-  Field_K7_0107: 0,
-  Field_K7_0108: 0,
-  Field_K7_0109: 0,
+  dbConnection: true,
+  kafkaConnection: true,
+  message: 'User service is connected to User Database',
 };
 
-export const mockDeviceTransform = {
-  Field_K7_0110: '49tbad6246c20de7a032',
-  Field_K7_0111: 'Mi Dispositivo',
-  Field_K7_0112: '48.48.78',
-  Field_K7_0113: '127.0.0.3',
-  Field_K7_0114: '',
-  Field_K7_0115: 0,
-  Field_K7_0116: '',
-  Field_K7_0117: '',
-  Field_K7_0118: 'Prueba',
-  Field_K7_0119: 'MiPC',
-  Field_K7_0120: '',
-  Field_K7_0121: '',
-  Field_K7_0122: '',
-  Field_K7_0123: '',
-  Field_K7_0124: '',
-  Field_K7_0125: '',
-  Field_K7_0126: '',
-  Field_K7_0127: '',
-  Field_K7_0128: '',
-  Field_K7_0129: '',
-  Field_K7_0130: '',
-  Field_K7_0131: '',
-  Field_K7_0132: 3186779266,
-  Field_K7_0133: '',
-  Field_K7_0134: '',
-  Field_K7_0135: 0,
-  Field_K7_0136: 0,
-};
-export const mockFutureUseTransform = {
-  Field_K7_0137: '',
-  Field_K7_0138: 0,
-  Field_K7_0139: '',
-  Field_K7_0140: '',
-  Field_K7_0141: '',
-  Field_K7_0142: '',
-  Field_K7_0143: '0',
-  Field_K7_0144: '',
-  Field_K7_0145: '',
-  Field_K7_0146: 0,
-  Field_K7_0147: '',
-  Field_K7_0148: 0,
-  Field_K7_0149: 0,
-  Field_K7_0150: '',
-  Field_K7_0151: '',
-  Field_K7_0152: 'ByteF',
-};
-export const mockBaseTransform: BaseTransform = {
-  headTrama: mockGetHead,
-  clientOriginTransform: mockGetClientOrigin.clientOrigin,
-  clientDestinationTransform: mockGetClientDestination.clientDestination,
-  productOriginTransform: mockGetProductOrigin.productOrigin,
-  productDestinationTransform: mockGetProductDestination.productDestination,
-  transactionTransform: mockGetTransaction,
-  deviceTransform: mockDeviceTransform,
-  futureUseTransform: mockFutureUseTransform,
+export const mockCheckResultError = {
+  dbConnection: false,
+  message: false,
+  kafkaConnection: false,
 };
 
-export const mockResultGenerateStructure =
-  'ByteIN14032023143708647K7        MFI-K7-002  123                                                                                                                             NCCtest                test                                                                                                                            test@test.com                                                   123                                                2023022100000000200008280001CO            5202302212023022100000000000000000000000000000000000000000000000000000000000000000000         t0   123                                                         CCtest                test                                                                                                                            test@test.com                                                   123                                                2023022100000000200008280001CO            5202302212023022100000000000000000000000000000000000000000000000000000000000000000000         t0   DE2   021720022000000               2023021000000002663802.695     00000000CO 00000000DE2   021720023333333333            2023021000000000248857.165     00000000CO 00000000                                             2023031420230315193701P0                         COP00000000000060000COP0000000000006000000000000000060000APE10    Exitoso   NCO                        00000000000049tbad6246c20de7a032Mi Dispositivo      48.48.78            127.0.0.3               000                                       Prueba                                                      MiPC                                                                                                                                                                                                                                                                                                            003186779266                     00000000000000                              00000000000000000                                                                                                                                  0                                                                     00000000000000000     000000000000000000000000000                                                                                                                                 ByteF';
-
-export const MOCK_REDIS_CONFIG: RedisClientOptions = {
-  store: redisStore,
-  host: 'localhost',
-  port: '6379',
-  ttl: 5,
-  auth_pass: 'token',
-  tls: { servername: 'localhost' },
+export const mockCreateuserRequest = {
+  documentNumber: '',
+  documentType: '',
+  enrollmentId: '',
+  firstName: '',
+  firstSurname: '',
+  phoneNumber: '',
+  username: '',
+  email: '',
+  phonePrefix: '',
+  secondName: '',
+  secondSurname: '',
+  deviceId: '',
+  gender: 1,
+  userGender: 2,
 };
+
+export const headers = {
+  Application: '',
+  ChannelId: '',
+  IpAddress: '',
+  Timestamp: '',
+  TransactionId: '',
+  SessionId: '',
+  UserAgent: '',
+  ClientId: '',
+  ClientIdType: '',
+  OriginCellphone: '',
+};
+
+export const sqsHeadersMock = {
+  application: '',
+  channelId: '',
+  ipAddress: '',
+  timestamp: '',
+  transactionId: '',
+  sessionId: '',
+  'user-agent': '',
+};
+export const mockHeadersEvent: HeadersEvent = {
+  application: '',
+  'user-agent': '',
+  channelId: '',
+  ipAddress: '',
+  timestamp: '',
+  transactionId: '',
+  attempts: '1',
+  sessionId: '',
+};
+
+export const updateUserEventRequest: UserEventDto = {
+  bPartnerId: '2',
+  enrollmentId: '4352f9e5-525d-47dd-99a3-6b9d8ed1fe88',
+  externalId: 300000003263806,
+  externalNumber: '52228',
+  phoneNumber: '3115952184',
+};
+
+export const mockKafkaContext: KafkaContext = new KafkaContext([
+  null,
+  1,
+  'topic',
+  null,
+  null,
+]);
+
 export const responseError = {
   response: {
     data: {
@@ -748,180 +480,35 @@ export const responseError = {
   name: '',
   message: '',
 };
-export const responseErrorNotHandled = {
-  response: {
-    data: {
-      error: {
-        message: 'Error no controlado',
-      },
-    },
-  },
-  config: {},
-  isAxiosError: true,
-  toJSON: null,
-  name: '',
+
+export const mockEventResponseFavorite = {
+  message: 'Mensaje enviado exitosamente',
+  httpStatusCode: 200,
+};
+
+export const mockFavorite = {
+  userId: '0',
+  favoriteAlias: 'test',
+  phoneNumber: '123',
+  clientId: '321',
+  clientIdType: 'CC',
+  originCellphone: '456',
+};
+
+export const mockResultFavorite = {
+  code: '0',
   message: '',
+  action: 'test',
 };
 
-export const mockAdditionals = {
-  beneficiaryDetails: {
-    beneficiaryAccount: '3001233303',
-  },
-  sourceDetails: {
-    sourceAccount: '3999999999',
-  },
-  userCustomMessage: 'message',
-};
-export const mockDateInformation: DateInfo = {
-  year: '2023',
-  month: '05',
-  day: '09',
-  hour: '14',
-  minute: '48',
+export const mockUserResponseUpdateLocate = {
+  data: 'Usuario actualizado correctamente',
 };
 
-export const mockSmsKeys = [
-  {
-    Key: '#Name',
-    Value: 'Diana',
+export const mockUserUpdateLocate = {
+  updateLocation: {
+    city: 'viterbo',
+    departament: 'caldas',
   },
-  {
-    Key: '#Amount',
-    Value: '$10.000,00',
-  },
-  {
-    Key: '#Date',
-    Value: '09/05/2023',
-  },
-  {
-    Key: '#Time',
-    Value: '14:48',
-  },
-];
-
-export const mockSmsKeysNoName = [
-  {
-    Key: '#Name',
-    Value: '',
-  },
-  {
-    Key: '#Amount',
-    Value: '$10.000,00',
-  },
-  {
-    Key: '#Date',
-    Value: '09/05/2023',
-  },
-  {
-    Key: '#Time',
-    Value: '14:48',
-  },
-];
-
-export const mockCardBasic = {
-  data: {
-    cardId: 0,
-    cardType: 0,
-    cardNumber: '123',
-    plasticName: 'test',
-    statusId: 0,
-    cardImage: 'https:',
-    productId: '0',
-    agreementId: 0,
-    address: 'dir',
-    cityName: 'Bogota',
-    departmentDaneCode: '11',
-    cityDaneCode: '0611',
-  },
-};
-
-export const userId = '123';
-
-export const getCardBasicResponseNotFound = {
-  data: {},
-  headers: {},
-  config: {},
-  status: 200,
-  statusText: 'OK',
-};
-
-export const mockKafkaContext: KafkaContext = new KafkaContext([
-  {
-    offset: '1',
-  } as KafkaMessage,
-  // null,
-  1,
-  'topic',
-  null,
-  null,
-]);
-
-export const mockDataString = {
-  CFO: {
-    general: {
-      transactionAmount: 1000,
-    },
-  },
-  RS: {
-    headerRS: {
-      timestamp: '2023-03-07T19:10:02Z',
-    },
-    statusRS: {
-      code: '407',
-      description: 'TRANSACCION FALLIDA',
-    },
-    messageRS: {
-      responses: [
-        {
-          confirmations: [
-            {
-              data: '',
-            },
-          ],
-        },
-      ],
-    },
-  },
-};
-export const mockAuditResponse = {
-  application: 'DALE 2.0',
-  clientId: '20230200134',
-  clientIdType: '2',
-  channel: 'PTS INTEGRADOR',
-  transactionId: '2334',
-  requestId: 'b59a145f-28ed-4652-8b2d-bf79606ebc60',
-  ipAddress: 'x.x.x.x',
-  sessionId: '2334',
-};
-
-export const mockEmptyClientdestination = {
-  Field_K7_0031: '',
-  Field_K7_0032: '',
-  Field_K7_0033: '',
-  Field_K7_0034: '',
-  Field_K7_0035: '',
-  Field_K7_0036: '',
-  Field_K7_0037: '',
-  Field_K7_0038: 0,
-  Field_K7_0039: 0,
-  Field_K7_0040: 0,
-  Field_K7_0041: '',
-  Field_K7_0042: '',
-  Field_K7_0043: '',
-  Field_K7_0044: '',
-  Field_K7_0045: '',
-  Field_K7_0046: '',
-  Field_K7_0047: '',
-  Field_K7_0048: 0,
-  Field_K7_0049: 0,
-  Field_K7_0050: 0,
-  Field_K7_0051: 0,
-  Field_K7_0052: 0,
-  Field_K7_0053: 0,
-  Field_K7_0054: '',
-  Field_K7_0055: '',
-  Field_K7_0056: '',
-  Field_K7_0057: 0,
-  Field_K7_0058: '',
-  Field_K7_0059: '',
+  phoneNumber: '3701212124',
 };

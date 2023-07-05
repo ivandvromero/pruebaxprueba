@@ -1,5 +1,11 @@
 import { Expose, Transform, TransformFnParams } from 'class-transformer';
-import { IsDefined, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import {
+  IsDefined,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class HeaderDTO {
   @IsUUID()
@@ -14,9 +20,9 @@ export class HeaderDTO {
   ChannelId: string;
 
   @IsUUID()
-  @IsDefined()
   @Expose({ name: 'sessionid' })
-  SessionId: string;
+  @IsOptional()
+  SessionId?: string;
 
   @IsString()
   @IsDefined()
@@ -41,8 +47,67 @@ export class HeaderDTO {
 
   @IsString()
   @IsDefined()
+  @IsOptional()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  @Expose({ name: 'useragent' })
+  UserAgent?: string;
+
+  @IsOptional()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  @Expose({ name: 'clientid' })
+  ClientId?: string;
+
+  @IsOptional()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  @Expose({ name: 'clientidtype' })
+  ClientIdType?: string;
+
+  @IsOptional()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  @Expose({ name: 'origincellphone' })
+  OriginCellphone?: string;
+}
+
+export class HeaderSqsDto {
+  @IsUUID()
+  @Expose({ name: 'transactionid' })
+  transactionId: string;
+
+  @IsString()
+  @IsDefined()
+  @IsNotEmpty()
+  @Expose({ name: 'channelid' })
+  channelId: string;
+
+  @IsUUID()
+  @IsDefined()
+  @Expose({ name: 'sessionid' })
+  @IsOptional()
+  sessionId?: string;
+
+  @IsString()
+  @IsDefined()
+  @IsNotEmpty()
+  // @Transform(({ value }: TransformFnParams) => value?.trim())
+  @Expose({ name: 'timestamp' })
+  timestamp: string;
+
+  @IsString()
+  @IsDefined()
   @IsNotEmpty()
   @Transform(({ value }: TransformFnParams) => value?.trim())
-  @Expose({ name: 'apiversion' })
-  ApiVersion: number;
+  @Expose({ name: 'ipaddress' })
+  ipAddress: string;
+
+  @IsString()
+  @IsDefined()
+  @IsNotEmpty()
+  @Expose({ name: 'application' })
+  application: string;
+
+  @IsString()
+  @IsDefined()
+  @IsNotEmpty()
+  @Expose({ name: 'user-agent' })
+  'user-agent': string;
 }

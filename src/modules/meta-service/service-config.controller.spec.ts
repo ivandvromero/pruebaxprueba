@@ -22,9 +22,7 @@ describe('Service controller', () => {
       controllers: [ServiceConfigController],
     }).compile();
 
-    serviceConfigController = testingModule.get<ServiceConfigController>(
-      ServiceConfigController,
-    );
+    serviceConfigController = testingModule.get(ServiceConfigController);
   });
 
   describe('get configuration endpoint', () => {
@@ -32,8 +30,7 @@ describe('Service controller', () => {
       const res = serviceConfigController.getConfig();
       expect(res).toHaveProperty('service');
       expect(res).toHaveProperty('kafka');
-      expect(res).toHaveProperty('redis');
-      expect(res).toHaveProperty('crm');
+      expect(res).toHaveProperty('database');
     });
   });
 });

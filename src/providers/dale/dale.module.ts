@@ -1,26 +1,20 @@
-import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
-import { DynamodbModule } from '@dale/aws-nestjs';
+import { RedisModule } from './../../db/redis/redis.module';
 import { LoggerModule } from '@dale/logger-nestjs';
-import { ClientsModule } from '@nestjs/microservices';
-import { KAFKA_CLIENT_CONFIG } from '../../config/kafka';
-import { DynamoDBService } from './services/dynamodb.service';
+import { HttpModule } from '@nestjs/axios';
+import { Module } from '@nestjs/common';
+import serviceConfiguration from '../../config/service-configuration';
+import { EnrollmentService } from './services/enrollment.service';
 import { ConfigurationService } from './services/configuration.service';
-import { DaleNotificationService } from './services/dale-notification.service';
 
 @Module({
   imports: [
-    HttpModule,
-    LoggerModule.forRoot({ context: 'dale notification module' }),
-    ClientsModule.register([
-      {
-        name: 'KAFKA_CLIENT',
-        ...KAFKA_CLIENT_CONFIG,
-      },
-    ]),
-    DynamodbModule.forRoot({ tableName: 'Monitor' }),
+    HttpModule.register({ maxRedirects: 5 }),
+    LoggerModule.forRoot({
+      context: `${serviceConfiguration().service.name} - dale service`,
+    }),
+    RedisModule,
   ],
-  exports: [DaleNotificationService, ConfigurationService, DynamoDBService],
-  providers: [DaleNotificationService, ConfigurationService, DynamoDBService],
+  providers: [EnrollmentService, ConfigurationService],
+  exports: [EnrollmentService, ConfigurationService],
 })
 export class DaleModule {}
