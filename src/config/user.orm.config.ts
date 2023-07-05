@@ -46,7 +46,10 @@ export const userConfig = (): ConnectionOptions => ({
   migrations: [__dirname + '/../db/migration/**/*.[tj]s'],
   seeds: [__dirname + '/../db/seeds/**/*.[tj]s'],
   ssl: false,
-  extra: {},
+  extra: {
+    connectionLimit: parseInt(process.env.DB_POOL_SIZE, 10),
+    connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIME_OUT, 10),
+  },
   keepConnectionAlive: true,
   ...overwriteConfig,
 });

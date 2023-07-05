@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Favorite } from './favorite.entity';
-import { DatabaseService } from '../connection/connection.service';
 
 import { ErrorCodesEnum } from '../../shared/code-erros/error-codes.enum';
 import {
@@ -16,7 +15,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class FavoriteDbService {
   constructor(
-    private dbService: DatabaseService,
     private eventLogService: EventLogService,
     @InjectRepository(Favorite)
     private favoriteRepository: Repository<Favorite>,

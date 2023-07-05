@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { Repository, UpdateResult } from 'typeorm';
 import { User } from './user.entity';
-import { DatabaseService } from '../connection/connection.service';
 import { ErrorCodesEnum } from '../../shared/code-erros/error-codes.enum';
 import {
   BadRequestExceptionDale,
@@ -14,13 +13,14 @@ import {
   UpdateLocateUserResponse,
 } from '../../modules/user/dto/update-locate.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Logger } from '@dale/logger-nestjs';
 
 @Injectable()
 export class UserDbService {
   constructor(
-    private dbService: DatabaseService,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @Optional() private logger?: Logger,
   ) {}
 
   async createUser(user: User): Promise<User> {
@@ -68,7 +68,15 @@ export class UserDbService {
   }
 
   async isDbConnectionAlive(): Promise<boolean | string> {
-    return this.dbService.isDbConnectionAlive();
+    try {
+      const query =
+        'SELECT COLUMN_NAME  FROM information_schema.COLUMNS LIMIT 1';
+      await this.userRepository.query(query);
+      return true;
+    } catch (error) {
+      this.logger?.error(`Error - ${error}`);
+      return error.message;
+    }
   }
 
   async findUserByPhoneNumber(phoneNumber: string): Promise<User> {

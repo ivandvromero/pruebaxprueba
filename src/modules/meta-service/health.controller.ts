@@ -4,14 +4,14 @@ import { KafkaHealthService } from '@dale/shared-nestjs/services/kafka/kafka-hea
 import { RedisHealthService } from '@dale/shared-nestjs/services/redis/redis-health-service';
 import { KAFKA_CLIENT_CONFIG } from '../../config/kafka';
 import { Response } from 'express';
-import { DatabaseService } from '../../db/connection/connection.service';
+import { UserDbService } from '../../db/user/user.service';
 
 @Controller('service/health')
 export class HealthController {
   constructor(
     private readonly kafkaHealthService: KafkaHealthService,
-    private readonly databaseService: DatabaseService,
     private readonly redisHealthService: RedisHealthService,
+    private readonly userDbService: UserDbService,
   ) {}
   @Get()
   @HttpCode(200)
@@ -29,7 +29,7 @@ export class HealthController {
       },
       {
         name: 'postgres',
-        check: async () => await this.databaseService.isDbConnectionAlive(),
+        check: async () => await this.userDbService.isDbConnectionAlive(),
       },
       {
         name: 'redis',

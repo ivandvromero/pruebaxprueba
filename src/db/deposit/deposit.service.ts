@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { DatabaseService } from '../connection/connection.service';
 import { Deposit } from './deposit.entity';
 
 import { ErrorCodesEnum } from '../../shared/code-erros/error-codes.enum';
@@ -10,7 +9,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class DepositDbService {
   constructor(
-    private dbService: DatabaseService,
     @InjectRepository(Deposit)
     private depositRepository: Repository<Deposit>,
   ) {}

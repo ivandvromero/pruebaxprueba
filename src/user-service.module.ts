@@ -14,9 +14,7 @@ import {
 } from '@dale/manage-errors-nestjs';
 import { ErrorCodeMessages } from './shared/code-erros/error-codes.local';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Deposit } from './db/deposit/deposit.entity';
-import { Favorite } from './db/favorite/favorite.entity';
-import { User } from './db/user/user.entity';
+import { userConfig } from './config/user.orm.config';
 
 @Module({
   imports: [
@@ -25,17 +23,7 @@ import { User } from './db/user/user.entity';
     ServiceModule,
     RedisModule,
     TypeOrmModule.forRootAsync({
-      useFactory: async () => ({
-        type: 'postgres',
-        host: process.env.TYPEORM_HOST,
-        port: parseInt(process.env.TYPEORM_PORT, 10),
-        username: process.env.TYPEORM_USER_USERNAME,
-        password: process.env.TYPEORM_USER_PASSWORD,
-        database: process.env.TYPEORM_USER_DATABASE,
-        entities: [Deposit, Favorite, User],
-        synchronize: true,
-        autoLoadEntities: true,
-      }),
+      useFactory: userConfig,
     }),
     ConfigModule.forRoot({
       envFilePath: enviroments[configuration().service.node_env] || '.env',

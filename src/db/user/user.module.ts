@@ -1,7 +1,6 @@
 import { UserDbService } from './user.service';
 import { Module } from '@nestjs/common';
 import { LoggerModule } from '@dale/logger-nestjs';
-import { DatabaseService } from '../connection/connection.service';
 import { User } from './user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 @Module({
@@ -10,6 +9,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     LoggerModule.forRoot({ context: 'User Database Service' }),
   ],
   exports: [UserDbService],
-  providers: [UserDbService, DatabaseService],
+  providers: [UserDbService],
 })
 export class UserDbModule {}
