@@ -1,10 +1,8 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Repository, UpdateResult } from 'typeorm';
 import { User } from './user.entity';
-import { config } from '../../config/user.orm.config';
 import { DatabaseService } from '../connection/connection.service';
 import { ErrorCodesEnum } from '../../shared/code-erros/error-codes.enum';
-import serviceConfiguration from '../../config/service-configuration';
 import {
   BadRequestExceptionDale,
   CustomException,
@@ -15,28 +13,15 @@ import {
   UpdateLocateDto,
   UpdateLocateUserResponse,
 } from '../../modules/user/dto/update-locate.dto';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
-export class UserDbService implements OnModuleInit {
-  private userRepository: Repository<User>;
-  constructor(private dbService: DatabaseService) {}
-
-  async onModuleInit() {
-    await this.dbService.init(
-      config,
-      serviceConfiguration().database.typeorm_user_database,
-    );
-    this.userRepository = this.dbService.getRepository(User);
-    if (serviceConfiguration().database.db_rotating_key === 'true') {
-      setInterval(async () => {
-        await this.dbService.init(
-          config,
-          serviceConfiguration().database.typeorm_user_database,
-        );
-        this.userRepository = this.dbService.getRepository(User);
-      }, Number(serviceConfiguration().database.db_connection_refresh_minutes) * 60 * 1000);
-    }
-  }
+export class UserDbService {
+  constructor(
+    private dbService: DatabaseService,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {}
 
   async createUser(user: User): Promise<User> {
     return await this.userRepository.save(user).catch((error: any) => {

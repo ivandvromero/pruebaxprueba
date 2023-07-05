@@ -1,6 +1,7 @@
 import { getConnectionManager } from 'typeorm';
 import { Injectable, Optional } from '@nestjs/common';
 import { Logger } from '@dale/logger-nestjs';
+
 @Injectable()
 export class DatabaseService {
   constructor(@Optional() private logger?: Logger) {}

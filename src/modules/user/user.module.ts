@@ -9,9 +9,12 @@ import { DepositDbModule } from '../../db/deposit/deposit.module';
 import { DaleModule } from '../../providers/dale/dale.module';
 import { SqsLogsService } from '../../providers/sqs-logs/sqs-logs.service';
 import { UserEventsController } from './user-events.controller';
+import { User } from './dto/user.dto';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([User]),
     LoggerModule.forRoot({ context: 'User Module' }),
     UserDbModule,
     DepositDbModule,

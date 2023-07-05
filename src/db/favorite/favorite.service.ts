@@ -1,11 +1,9 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Favorite } from './favorite.entity';
-import { config } from '../../config/user.orm.config';
 import { DatabaseService } from '../connection/connection.service';
 
 import { ErrorCodesEnum } from '../../shared/code-erros/error-codes.enum';
-import serviceConfiguration from '../../config/service-configuration';
 import {
   CreateFavoriteDto,
   ResultFavorite,
@@ -13,27 +11,16 @@ import {
 import { HeaderDTO } from '../../shared/dto/header.dto';
 import { EventLogService } from '../../shared/event-log/event-log-service';
 import { BadRequestExceptionDale } from '@dale/manage-errors-nestjs';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
-export class FavoriteDbService implements OnModuleInit {
-  private favoriteRepository: Repository<Favorite>;
+export class FavoriteDbService {
   constructor(
     private dbService: DatabaseService,
     private eventLogService: EventLogService,
+    @InjectRepository(Favorite)
+    private favoriteRepository: Repository<Favorite>,
   ) {}
-
-  async onModuleInit() {
-    this.favoriteRepository = this.dbService.getRepository(Favorite);
-    if (serviceConfiguration().database.db_rotating_key === 'true') {
-      setInterval(async () => {
-        await this.dbService.init(
-          config,
-          serviceConfiguration().database.typeorm_user_database,
-        );
-        this.favoriteRepository = this.dbService.getRepository(Favorite);
-      }, Number(serviceConfiguration().database.db_connection_refresh_minutes) * 60 * 1000);
-    }
-  }
 
   async createFavorite(
     id: string,
