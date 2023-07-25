@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "backoffice-service.name" -}}
+{{- define "monitor-service.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "backoffice-service.fullname" -}}
+{{- define "monitor-service.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "backoffice-service.chart" -}}
+{{- define "monitor-service.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "backoffice-service.labels" -}}
-helm.sh/chart: {{ include "backoffice-service.chart" . }}
-{{ include "backoffice-service.selectorLabels" . }}
+{{- define "monitor-service.labels" -}}
+helm.sh/chart: {{ include "monitor-service.chart" . }}
+{{ include "monitor-service.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "backoffice-service.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "backoffice-service.name" . }}
+{{- define "monitor-service.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "monitor-service.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "backoffice-service.serviceAccountName" -}}
+{{- define "monitor-service.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "backoffice-service.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "monitor-service.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

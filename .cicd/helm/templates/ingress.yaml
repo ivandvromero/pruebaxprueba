@@ -1,5 +1,5 @@
 {{- if .Values.ingress.enabled -}}
-{{- $fullName := include "backoffice-service.fullname" . -}}
+{{- $fullName := include "monitor-service.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
 {{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
@@ -17,13 +17,11 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    {{- include "backoffice-service.labels" . | nindent 4 }}
+    {{- include "monitor-service.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-    alb.ingress.kubernetes.io/actions.response-200: >
-      {"type":"fixed-response","fixedResponseConfig":{"contentType":"text/plain","statusCode":"200","messageBody":"healthy"}}
 spec:
   {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
   ingressClassName: {{ .Values.ingress.className }}
@@ -43,13 +41,6 @@ spec:
     - host: {{ .host | quote }}
       http:
         paths:
-          - path: /health
-            pathType: Exact
-            backend:
-              service:
-                name: response-200
-                port:
-                  name: use-annotation
           {{- range .paths }}
           - path: {{ .path }}
             {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}

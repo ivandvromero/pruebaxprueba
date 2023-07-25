@@ -5,12 +5,10 @@ ARG DEVOPS_ACCOUNT_ID
 ARG AWS_DEFAULT_REGION
 
 # Install
+RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
+
 RUN apk --no-cache add python3 py3-pip
-RUN pip install pip==21.3.1 &&\
-    pip3 install pip==21.3.1 &&\
-    python -m pip install pip==21.3.1 &&\
-    python3 -m pip install pip==21.3.1
-RUN pip3 install --no-cache-dir awscli
+RUN  pip3 install --no-cache-dir awscli
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -54,16 +52,22 @@ RUN chown -R node /usr/src/app
 
 # Copy the bundled code from the build stage to the production image
 COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node --from=build /usr/src/app/dist/ ./
+COPY --chown=node:node --from=build /usr/src/app/dist ./dist
 COPY --chown=node:node --from=build /usr/src/app/package.json ./
+COPY --chown=node:node --from=build /usr/src/app/src/certchain/ca-certificate-chain.pem ./src/certchain/ca-certificate-chain.pem
+
+# Update certificates
+RUN export CA_CERTIFICATES_PACKAGE=$(apk search 'ca-certificates' |awk '/^ca-certificates-/{print $1; exit}' | sed 's/ca-certificates-//g') && \
+    apk add --no-cache ca-certificates=$CA_CERTIFICATES_PACKAGE
+COPY src/certchain/*  /usr/local/share/ca-certificates/
+RUN update-ca-certificates
 
 #migration
-COPY --chown=node:node --from=build /usr/src/app/.cicd/service.entrypoint.sh ./.cicd/service.entrypoint.sh
-COPY --chown=node:node --from=build /usr/src/app/pre-orm.js ./
-COPY --chown=node:node --from=build /usr/src/app/tsconfig.json ./
+#COPY --chown=node:node --from=build /usr/src/app/.cicd/service.entrypoint.sh ./.cicd/service.entrypoint.sh
+#COPY --chown=node:node --from=build /usr/src/app/pre-orm.js ./
 
 USER node
 
 EXPOSE 3000
 # Start the server using the production build
-CMD sh -c "sh .cicd/service.entrypoint.sh && npm run typeorm:migrate && node src/main.js"
+CMD [ "node", "dist/main.js" ]

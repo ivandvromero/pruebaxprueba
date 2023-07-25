@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "resolveJsonModule": true,
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -16,25 +17,6 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false,
-    "paths": {
-      "@dale/auth/*": ["./src/shared/providers/auth0/modules/auth/*"],
-      "@dale/client/*": ["./src/client/*"],
-      "@dale/monetary-adjustment/*": ["./src/monetary-adjustment/*"],
-      "@dale/notifications/*": ["./src/notifications/*"],
-      "@dale/user-work-balancer/*": ["./src/shared/user-work-balancer/*"],
-      "@dale/exceptions/*": ["./src/shared/errors/*"],
-      "@dale/db/*": ["./src/shared/db/*"],
-      "@dale/testcases/*": ["./src/shared/testcases/*"],
-      "@dale/crm-connector-adapter/*": ["./src/shared/providers/crm-connector-adapter/*"],
-      "@dale/http-adapters/*": ["./src/shared/providers/http-adapters/*"],
-      "@dale/mambu-connector-adapter/*": ["./src/shared/providers/mambu-connector-adapter/*"],
-      "@dale/pts-connector/*": ["./src/shared/providers/pts-connector-adapter/*"],
-      "@dale/permissions/*": ["./src/shared/utils/permissions/*"],
-      "@dale/session-time/*": ["./src/session-time/*"],
-      "@dale/roles/*": ["./src/roles/*"],
-      "@dale/interceptors/*": ["./src/shared/interceptors/*"],
-      "@dale/transaction-codes/*": ["./src/transaction-codes/*"],
-    }
+    "noFallthroughCasesInSwitch": false
   }
 }

@@ -11,10 +11,6 @@ export HELM_CHARTS_DIR=$7
 export CONTAINER_IMAGE=$8
 export VERSION=$9
 export SECRET_PATH=${10}
-export S3_BUCKET=${11}
-export SERVICE_HEALTH_PATH=${12}
-export ALB_LOG_ACCESS_BUCKET=${13}
-export CERTIFICATE_ARN=${14}
 
 export JSON_ASSUME_FILE=assume-role-${STAGE}.json
 # export DEPLOY_ROLE_ARN=arn:aws:iam::261166643659:role/dale-dev-compute-eks-cluster-eks-pod-execution-us-east-1
@@ -61,12 +57,6 @@ echo helm upgrade --namespace $EKS_NAMESPACE --create-namespace --values ./$HELM
     --set image.repository=$CONTAINER_IMAGE \
     --set image.tag=$VERSION \
     --set secret.path=$SECRET_PATH \
-    --set env.S3_BUCKET=$S3_BUCKET \
-    --set ingress.annotations."alb\.ingress\.kubernetes\.io/tags"="Environment=${STAGE}" \
-    --set ingress.annotations."alb\.ingress\.kubernetes\.io/load-balancer-name"="${APP_NAME}-bo-alb" \
-    --set ingress.annotations."alb\.ingress\.kubernetes\.io/certificate-arn"="${CERTIFICATE_ARN}" \
-    --set ingress.annotations."alb\.ingress\.kubernetes\.io/healthcheck-path"=$SERVICE_HEALTH_PATH \
-    --set ingress.annotations."alb\.ingress\.kubernetes\.io/load-balancer-attributes"="deletion_protection.enabled=false\,routing.http2.enabled=true\,idle_timeout.timeout_seconds=60\,routing.http.drop_invalid_header_fields.enabled=true\,access_logs.s3.enabled=true\,access_logs.s3.bucket=$ALB_LOG_ACCESS_BUCKET\,access_logs.s3.prefix=$STAGE/$APP_NAME" \
     --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=$SA_IAM_ROLE_ARN \
     --wait --install $HELM_RELEASE_NAME ./$HELM_CHARTS_DIR --timeout 10m
 
@@ -74,12 +64,6 @@ helm upgrade --namespace $EKS_NAMESPACE --create-namespace --values ./$HELM_CHAR
     --set image.repository=$CONTAINER_IMAGE \
     --set image.tag=$VERSION \
     --set secret.path=$SECRET_PATH \
-    --set env.S3_BUCKET=$S3_BUCKET \
-    --set ingress.annotations."alb\.ingress\.kubernetes\.io/tags"="Environment=${STAGE}" \
-    --set ingress.annotations."alb\.ingress\.kubernetes\.io/load-balancer-name"="${APP_NAME}-bo-alb" \
-    --set ingress.annotations."alb\.ingress\.kubernetes\.io/certificate-arn"="${CERTIFICATE_ARN}" \
-    --set ingress.annotations."alb\.ingress\.kubernetes\.io/healthcheck-path"=$SERVICE_HEALTH_PATH \
-    --set ingress.annotations."alb\.ingress\.kubernetes\.io/load-balancer-attributes"="deletion_protection.enabled=false\,routing.http2.enabled=true\,idle_timeout.timeout_seconds=60\,routing.http.drop_invalid_header_fields.enabled=true\,access_logs.s3.enabled=true\,access_logs.s3.bucket=$ALB_LOG_ACCESS_BUCKET\,access_logs.s3.prefix=$STAGE/$APP_NAME" \
     --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=$SA_IAM_ROLE_ARN \
     --wait --install $HELM_RELEASE_NAME ./$HELM_CHARTS_DIR --timeout 10m
 

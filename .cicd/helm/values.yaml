@@ -6,79 +6,79 @@ replicaCount: 1
 
 image:
   pullPolicy: Always
- 
+
 env:
-  KAFKA_SSL_ENABLED: "true"
-  CLOUD_SERVICE_PROVIDER: "AWS"
-  SERVICE_TYPE: "api"
-  SERVICE_NAME: "backoffice-service"
-  TRANSFER_VALIDATION_SERVICE_PORT: 3000
-  DB_ROTATING_KEY: "true"
-  NODE_ENV: "development"
-  DB_CONNECTION_REFRESH_MINUTES: 14
-  PTS_REFRESH_TOKEN: 170
-  DB_SSL_ENABLED: "true"
-  S3_BUCKET: ''
-  AWS_REGION: "us-east-1"
-  AWS_XRAY_DAEMON_ADDRESS: "xray-service.default:2000"
-  TYPEORM_BACKOFFICE_DATABASE: 'backoffice'
-  TYPEORM_BACKOFFICE_USERNAME: 'backoffice'
-  AUTH0_AUDIENCE: https://panel-administrativo/
+  NODE_ENV: 'production'
+  SERVICE_TYPE: 'api'
+  SERVICE_NAME: 'monitor-service'
+  MONITOR_SERVICE_PORT: 3000
+  CLOUD_SERVICE_PROVIDER: 'AWS'
+  AWS_REGION: 'us-east-1'
+  AWS_XRAY_DAEMON_ADDRESS: 'xray-service.default:2000'
   ENABLE_AUDIT: 'false'
-  AWS_XRAY_CONTEXT_MISSING: 'IGNORE_ERROR'
-  AWS_XRAY_LOG_LEVEL: 'error'
-  REDIS_TLS_ENABLED: "true"
+  REDIS_TLS_ENABLED: 'true'
+  NODE_EXTRA_CA_CERTS: 'src/certchain/ca-certificate-chain.pem'
+  KAFKA_SSL_ENABLED: 'true'
+  ENROLLMENT_NP_SERVICE_URL: 'https://enrollment-np-service.default.svc.cluster.local:5016'
+  USER_SERVICE_URL: 'https://user-service.default.svc.cluster.local:5003'
+  CONFIGURATION_SERVICE_URL: 'https://configuration-service.default.svc.cluster.local:5014'
   REDIS_TTL: 43200
+  KAFKA_RETRIES: 0
+  EVENT_LOG_VERSION: '3.0'
+  EVENT_LOG_MNEMONIC: 'TRFINTRCR'
+  EVENT_LOG_DEBITCODE: '100'
+  EVENT_LOG_CREDITCODE: '101'
+  EVENT_LOG_DEBITNAME: 'MONEY_TRANSFER_CORE'
+  EVENT_LOG_CREDITNAME: 'RECEIVE_TRANSFER_CORE'
+  EVENT_LOG_APPLICATION: 'DALE 2.0'
+  EVENT_LOG_CHANNEL: 'PTS INTEGRADOR'
+  KAFKA_SSL_ENABLED_PTS: true
+  KAFKA_RETRY_POLICY_PTS: 4
+  KAFKA_RETRY_POLICY: 4
+  AWS_XRAY_CONTEXT_MISSING: 'LOG_ERROR'
+  AWS_XRAY_LOG_LEVEL: 'error'
+  CARD_SERVICE_URL: 'https://card-service.default.svc.cluster.local:5015'
+  
 
 secret:
-  path: 
-  name: 
+  path:
+  name:
     - CERTIFICATE_CHAIN
     - CERTIFICATE_PRIVATE_KEY
     - PUBLIC_CERTIFICATE
-    - KAFKA_URLS
-    - PTS_API_URL
-    - PTS_PWD
-    - PTS_SANDBOX_URL
-    - PTS_USER
-    - PTS_ROOT_PATH
-    - PTS_AUTHORIZATION
-    - PTS_PCHANNEL
-    - SASL_PASSWORD
-    - SASL_USERNAME
-    - TYPEORM_HOST          
-    - TYPEORM_PORT
-    - MAMBU_URL
-    - MAMBU_API_KEY
-    - MAMBU_ACCEPT_HEADER
-    - MAMBU_ROOT_PATH
-    - CRM_SERVICE_URL
-    - CRM_USERNAME
-    - CRM_PASSWORD
-#    - AUTH0_AUDIENCE
-    - AUTH0_HOOK_SECRET
-    - AUTH0_ISSUER_URL   
-    - SQS_TRANSACTION_LOG
-    - AUTH0_CONNECTOR
-    - AUTH0_SECRET
-    - AUTH0_ID
     - REDIS_AUTH_TOKEN
     - REDIS_HOST
     - REDIS_PORT
+    - KAFKA_URLS
+    - SASL_USERNAME
+    - SASL_PASSWORD
+    - KAFKA_URLS_PTS
+    - KAFKA_TOPIC_PTS
+    - SASL_USERNAME_PTS
+    - SASL_PASSWORD_PTS
+    - CRM_SERVICE_URL
+    - CRM_USERNAME
+    - CRM_PASSWORD
+    - SQS_TRANSACTION_LOG
+    - SQS_URL
+    - SECRET_ID_GENERATE_KEY_SYMETRIC_AUDMON
+    - SECRET_PATH_GENERATE_KEY_SYMETRIC_AUDMON
+
+
 
 imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: ''
+fullnameOverride: ''
 
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: "backoffice-service"
+  name: 'monitor-service'
   # Annotations to add to the service account
-  annotations: 
-    required: "true"
+  annotations:
+    required: 'true'
 
 podAnnotations: {}
 podSecurityContext: {}
@@ -86,38 +86,13 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 5018
+  port: 5020
   targetPort: 3000
 
 ingress:
-  enabled: true
-  className: ""
-  annotations:
-    ## ALB
-    alb.ingress.kubernetes.io/group.name: dale-backoffice
-    kubernetes.io/ingress.class: alb
-    alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS-1-2-2017-01
-    alb.ingress.kubernetes.io/scheme: internal
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
-    alb.ingress.kubernetes.io/backend-protocol: HTTPS
-    ## HEALTH CHECK
-    alb.ingress.kubernetes.io/healthcheck-protocol: HTTPS
-    alb.ingress.kubernetes.io/healthcheck-port: traffic-port
-    alb.ingress.kubernetes.io/healthcheck-interval-seconds: '20'
-    alb.ingress.kubernetes.io/success-codes: 200,201,204
-    alb.ingress.kubernetes.io/healthy-threshold-count: '3'
-    alb.ingress.kubernetes.io/unhealthy-threshold-count: '3'
-    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '10'
-  hosts:
-    - host: ""
-      paths:
-        - path: /client/*
-          pathType: ImplementationSpecific
-        - path: /monetaryAdjustment/*
-          pathType: ImplementationSpecific
-        - path: /api
-          pathType: Prefix
+  enabled: false
+  className: ''
+  annotations: {}
   tls: []
 
 resources:
@@ -139,5 +114,3 @@ nodeSelector: {}
 
 tolerations: []
 affinity: {}
-
-

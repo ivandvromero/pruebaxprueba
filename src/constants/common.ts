@@ -1,0 +1,5 @@
+export const functionalities = {
+  SERVICE_CONFIGURATION: 'SERVICE_CONFIGURATION',
+  GET_USER_DATA: 'GET_USER_DATA',
+};
+
