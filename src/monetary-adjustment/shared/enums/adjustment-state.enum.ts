@@ -1,0 +1,7 @@
+export enum AdjustmentState {
+  ACCEPTED = 'ACCEPTED',
+  FAILED = 'FAILED',
+  REJECTED = 'REJECTED',
+  PENDING = 'PENDING',
+  ACCEPTED_WITH_ERROR = 'ACCEPTED_WITH_ERROR',
+}

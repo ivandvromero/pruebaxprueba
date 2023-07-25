@@ -1,0 +1,15 @@
+export enum cardAgreementEnum {
+  DALE = 'DALE',
+  LIFEMILES = 'LIFE MILES',
+  PLERK = 'PLERK',
+  VITA = 'VITA',
+  DLOCAL = 'DLOCAL',
+  PLURALL = 'PLURALL',
+  WALO = 'WALO',
+  REDLLANTAS = 'REDLLANTAS',
+  COBRU = 'COBRU',
+  ETICKET = 'E-TICKET',
+  UBER = 'UBER',
+  MILLONARIOS = 'MILLONARIOS',
+  EMPTY = '',
+}

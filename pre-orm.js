@@ -1,16 +1,16 @@
-/**
- * Executed to run migrations with required AWS tokens in the ORM config
- */
-
-/* eslint-disable @typescript-eslint/no-var-requires */
-// require('shared/config/env/env.config');
-
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const AWS = require('aws-sdk');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
 
 const getAuthToken = () => {
-  if (!(process.env.TYPEORM_HOST && process.env.CLOUD_SERVICE_PROVIDER?.toUpperCase() === 'AWS' )) {
-    return
+  if (
+    !(
+      process.env.TYPEORM_HOST &&
+      process.env.CLOUD_SERVICE_PROVIDER?.toUpperCase() === 'AWS'
+    )
+  ) {
+    return;
   }
 
   const signer = new AWS.RDS.Signer({
@@ -21,14 +21,11 @@ const getAuthToken = () => {
 
   signer.getAuthToken(
     {
-      username: 'user',
+      username: 'backoffice',
     },
     (err, token) => {
       if (err) console.log(err);
-      fs.writeFileSync(
-        `userToken`,
-        token,
-      );
+      fs.writeFileSync(`backofficeToken`, token);
     },
   );
 };

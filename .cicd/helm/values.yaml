@@ -1,0 +1,143 @@
+# Default values for product-service.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  pullPolicy: Always
+ 
+env:
+  KAFKA_SSL_ENABLED: "true"
+  CLOUD_SERVICE_PROVIDER: "AWS"
+  SERVICE_TYPE: "api"
+  SERVICE_NAME: "backoffice-service"
+  TRANSFER_VALIDATION_SERVICE_PORT: 3000
+  DB_ROTATING_KEY: "true"
+  NODE_ENV: "development"
+  DB_CONNECTION_REFRESH_MINUTES: 14
+  PTS_REFRESH_TOKEN: 170
+  DB_SSL_ENABLED: "true"
+  S3_BUCKET: ''
+  AWS_REGION: "us-east-1"
+  AWS_XRAY_DAEMON_ADDRESS: "xray-service.default:2000"
+  TYPEORM_BACKOFFICE_DATABASE: 'backoffice'
+  TYPEORM_BACKOFFICE_USERNAME: 'backoffice'
+  AUTH0_AUDIENCE: https://panel-administrativo/
+  ENABLE_AUDIT: 'false'
+  AWS_XRAY_CONTEXT_MISSING: 'IGNORE_ERROR'
+  AWS_XRAY_LOG_LEVEL: 'error'
+  REDIS_TLS_ENABLED: "true"
+  REDIS_TTL: 43200
+
+secret:
+  path: 
+  name: 
+    - CERTIFICATE_CHAIN
+    - CERTIFICATE_PRIVATE_KEY
+    - PUBLIC_CERTIFICATE
+    - KAFKA_URLS
+    - PTS_API_URL
+    - PTS_PWD
+    - PTS_SANDBOX_URL
+    - PTS_USER
+    - PTS_ROOT_PATH
+    - PTS_AUTHORIZATION
+    - PTS_PCHANNEL
+    - SASL_PASSWORD
+    - SASL_USERNAME
+    - TYPEORM_HOST          
+    - TYPEORM_PORT
+    - MAMBU_URL
+    - MAMBU_API_KEY
+    - MAMBU_ACCEPT_HEADER
+    - MAMBU_ROOT_PATH
+    - CRM_SERVICE_URL
+    - CRM_USERNAME
+    - CRM_PASSWORD
+#    - AUTH0_AUDIENCE
+    - AUTH0_HOOK_SECRET
+    - AUTH0_ISSUER_URL   
+    - SQS_TRANSACTION_LOG
+    - AUTH0_CONNECTOR
+    - AUTH0_SECRET
+    - AUTH0_ID
+    - REDIS_AUTH_TOKEN
+    - REDIS_HOST
+    - REDIS_PORT
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: "backoffice-service"
+  # Annotations to add to the service account
+  annotations: 
+    required: "true"
+
+podAnnotations: {}
+podSecurityContext: {}
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 5018
+  targetPort: 3000
+
+ingress:
+  enabled: true
+  className: ""
+  annotations:
+    ## ALB
+    alb.ingress.kubernetes.io/group.name: dale-backoffice
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS-1-2-2017-01
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/backend-protocol: HTTPS
+    ## HEALTH CHECK
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTPS
+    alb.ingress.kubernetes.io/healthcheck-port: traffic-port
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: '20'
+    alb.ingress.kubernetes.io/success-codes: 200,201,204
+    alb.ingress.kubernetes.io/healthy-threshold-count: '3'
+    alb.ingress.kubernetes.io/unhealthy-threshold-count: '3'
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '10'
+  hosts:
+    - host: ""
+      paths:
+        - path: /client/*
+          pathType: ImplementationSpecific
+        - path: /monetaryAdjustment/*
+          pathType: ImplementationSpecific
+        - path: /api
+          pathType: Prefix
+  tls: []
+
+resources:
+  limits:
+    cpu: 256m
+    memory: 512Mi
+  requests:
+    cpu: 128m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+affinity: {}
+
+

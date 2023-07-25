@@ -1,0 +1,6 @@
+export enum cardStateEnum {
+  BLOQUEADO = 'BLOQUEADO',
+  ACTIVO = 'ACTIVO',
+  EXPEDIDO = 'EXPEDIDO',
+  CANCELADO = 'CANCELADO',
+}
