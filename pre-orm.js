@@ -1,6 +1,10 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+/**
+ * Executed to run migrations with required AWS tokens in the ORM config
+ */
+
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 const AWS = require('aws-sdk');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
 
 const getAuthToken = () => {
@@ -21,11 +25,11 @@ const getAuthToken = () => {
 
   signer.getAuthToken(
     {
-      username: 'backoffice',
+      username: 'account',
     },
     (err, token) => {
       if (err) console.log(err);
-      fs.writeFileSync(`backofficeToken`, token);
+      fs.writeFileSync(`accountToken`, token);
     },
   );
 };

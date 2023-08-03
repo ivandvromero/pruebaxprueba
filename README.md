@@ -1,13 +1,29 @@
-# Backoffice Microservice
+# Account Microservices
 
-In this readme you will find all information related with backofficce microservice
+In this readme you know all inofrmation related with account microservice.
 
-## Requirements
+* Read this in other languages: [Spanish](README.esp.md).
 
-Before using this microservice, we recommend having postgres.
-If not we recommend to use a Docker image.
+# Table of Contents
+  - [Requirements :page_facing_up:](#Requirements)
+  - [Node package :package: installation](#Node-package-installation)
+  - [Environment Variables :earth_americas:](#Environment-Variables)
+  - [Run :bicyclist: the microservice in local environment ](#Run-the-microservice-in-local-environment)
+  - [Running :bicyclist: tests](#Running-tests)
+  - [Migrations :rocket:](#Migrations)
+  - [Run Docker :anchor:](#Run-Docker)
+  - [Project structure :file_folder:](#Project-structure)
+  - [Good practices :surfer: :sunglasses:](#Good-practices)
 
-# <a name="Node-package-installation">Node package :package: installation</a>
+# <a name="Requirements">Requirements :page_facing_up:</a> 
+
+Before to start the microservice, We recommend having Postgres, Kafka and Redis installed. Either in Docker or the url exposed by dale.
+
+remember to update the paths in the .env file
+
+install [Node.js](https://nodejs.org/es/ 'Node') :link: on version 16.17.0
+
+# <a name="Node-package-installation">Node package :package: installation</a>   
 
 Before installing npm dependencies, follow these steps carefully.
 
@@ -23,18 +39,19 @@ Default region name [None]: XXXXXXX
 Default output format [None]: json
 ```
 
+
 - In your visual studio code terminal :computer: run the command `npm install` in the root of the project.
 
 - If you get any errors with aws:
-  run this command first `npm run co:login` and then `npm install`
+run this command first `npm run co:login` and then `npm install`
 
-# <a name="Environment-Variables">Environment Variables :earth_americas:</a>
+# <a name="Environment-Variables">Environment Variables :earth_americas:</a>  
 
 Your team can share these files with you but, if you're starting fresh, you will need to create them yourself:
 
 - Create `dev.env` and `test.env` files in the root directory. Use the [dev.env.template](./dev.env.template) :link: and [test.env.template](./test.env.template) :link: for reference and add your secrets.
 
-# <a name="Run-the-microservice-in-local-environment">Run :bicyclist: the microservice in local environment</a>
+# <a name="Run-the-microservice-in-local-environment">Run :bicyclist: the microservice in local environment</a>   
 
 - run the following command to start the microservice :computer:
 
@@ -50,7 +67,7 @@ npm run start:dev
 
 - You can access the documentation once the microservice is running through the following urls. [http://localhost:5003/docs]('http://localhost:5003/docs') :link:
 
-# <a name="Running-tests">Running :bicyclist: tests</a>
+# <a name="Running-tests">Running :bicyclist: tests</a> 
 
 To run the tests, you can run any of the following commands :computer: :
 
@@ -74,52 +91,50 @@ npm run test:debug
 npm run test:e2e
 ```
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+# <a name="Migrations">Migrations :rocket:</a> 
 
-## Installation
+If the microservice has a database connection configured, the following commands must be executed, depending on your need.
 
-```bash
-$ npm install
+- To apply the migrations to our database, run the following command :computer: :
+
+```shell
+npm run typeorm:migrate
 ```
 
-## Running the app
+- To perform some rollback of a database migration, run the following command :computer: :
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```shell
+npm run typeorm:revert
 ```
 
-## Test
+- To create a new migration, run the following command :computer: :
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```shell
+npm run typeorm:generate src/db/migration/name-migration
 ```
+- Replace name-migration with the name you want to give the new migration.
 
-# <a name="Auth Service">Auth Service</a>
+# <a name="Run-Docker">Run Docker :anchor:</a>
 
-To validate users you must include:
+In progress
 
-```js
-import { Auth0Guard } from '@auth/auth.guard';
-import { PermissionsGuard } from '@auth/permission.guard';
-import { Permissions } from '@auth/permissions.decorator';
+# <a name="Project-structure">Project structure :file_folder:</a>  
 
-export class controller{
-  @UseGuards(Auth0Guard, PermissionsGuard)
-  @Permissions('MonetaryAdjustment:write', 'MonetaryAdjustment:read')
-  async Controller(){} 
-}
+```sh
+account-nestjs-ms/
+├── src              # In this folder is the application code
+      ├── config
+      ├── constants
+      ├── modules
+      ├── providers
+      ├── utils
+      ├── main.ts
+├── test
+├── dev.env
+├── package.json
 ```
+# <a name="Good-practices">Good practices :surfer: :sunglasses:</a> 
+
+Remember that all code you write in this microservice must be in English, including comments.
+
+Do not forget that the description of the commit's must also be in English  and the message must be descriptive with the code that you are going to upload.

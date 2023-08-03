@@ -1,9 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "backoffice-service.fullname" . }}
+  name: {{ include "account-service.fullname" . }}
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: dev.dale2.0.internal
   labels:
-    {{- include "backoffice-service.labels" . | nindent 4 }}
+    {{- include "account-service.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,4 +14,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "backoffice-service.selectorLabels" . | nindent 4 }}
+    {{- include "account-service.selectorLabels" . | nindent 4 }}

@@ -1,104 +1,67 @@
-
 ## [0.8.0]
 
--
+
+## [0.7.5]
+
+- [TRANSFE-247] FIX - Convert string to boolean in field withBalance and fetch document type name from configuration. Depends on microservice configuration-nestjs-ms version [0.13.0]
+
 ## [0.7.4]
 
-- [PanelAdmin-387] Se corrige el apuntado de la api hacia PTS para la consulta de transacciones
+- [TRANSFE-376] Fixed name for table header field in account statements strategy
+- [TRANSFE-1570] Added strategy for account statements PDF generation
+- [TRANSFE-1478] Integración ADL check trx
+- [TRANSFE-247] Estrategia para generar información del certificado de depósito electrónico y obtener url del archivo pdf del bucket S3. Depende de información de la cuenta en PTS, de la tabla Account de base de datos PostgreSQL y del microservicio pdfgenerate-nestjs-ms [0.1.0]. 
+- Se ajusta la configuración del health check para redis.
+- Se ajusta la feach-hora del logs transaccional.
+- [TRANSFE-693] Se agrego query y mutation para el tema de topes de cuenta de usuario y se modifico respuesta tal cual como lo requeria el front
+
 ## [0.7.3]
 
-- [PanelAdmin-1089] Se corrige bug donde en no se muestran los errores de PTS
+- Se elimina logs al cerrar conexión de base de datos.
+- Se ajusta valor de refresh token pts para ambiente PRD 
 
 ## [0.7.2]
-
-- [PanelAdmin-1084] Se corrige bug donde en cierto escenario la cache permitia asignar ajustes al rol incorrecto.
-- [PanelAdmin-1077] Se corrige mensaje de respuesta cuando el servicio de PTS no está disponible
-
+- Se agrega servicio de configuración para traer el tipo de documento.
+- Se modifica la creación de los usuarios para almacenar la hora de colombia en los valores updateAt.
+- Enviar a colca de kafka, informacion del paso de enrolamiento que se esta ejecutando
 ## [0.7.1]
 
-- [PanelAdmin-1068] Se corrige bug donde el limite de caracteres era 100, se actualiza a 300 para rechazar ajustes.
-- [PanelAdmin-HotFix] Se corrige error cuando no existe el rol en base de datos devolvía error.
+- [OFDD20-1403] Se implementa servicio de health check
+- Cola de reintentos para los eventos de kafka fallidos para los servicios de enrollment natural person
 
 ## [0.7.0]
-- [PanelAdmin-387] Se corrige bug de campos inexistentes y criterio de busqueda erroneo en PTS
-- [PanelAdmin-706] Tiempo de inactividad según rol, DEPENDENCIAS: correr migraciones: AddSessionTimeColumnRoleTable1688654603330, AddUniqueConstrainToRoleNameRoleTable1688655199264 y AddUniqueConstrainToCodeInCodesTable1688656336726.
-- [PanelAdmin-435] PEPS Rechazo de Enrolamiento USUARIO VERIFICADOR, DEPENDENCIAS:Correr migraciones HistoricalPeps1687810382203 y NewFieldsAsPhoneAndEmailToHistoricalPeps1688580236941
-- [PanelAdmin-424] PEPS Aprobación de Enrolamiento USUARIO VERIFICADOR, DEPENDENCIAS: Correr migraciones HistoricalPeps1687810382203 y NewFieldsAsPhoneAndEmailToHistoricalPeps1688580236941
+
+- [OFDD20-973] Se agrega servicio para envío de logs a sqs luego de crear la cuenta en PTS
+- Se agrega servicio para hacer consultas al MS de enrollment natural person.
+- Se modifica el metodo de createAccountinPTS para recibir headers en el evento de kafka.
 
 ## [0.6.0]
 
-- [PanelAdmin-905] Se corrige bug para permitir verificar multiples ajustes individuales y masivos
-- [PanelAdmin-435] PEPS Rechazo de Enrolamiento USUARIO VERIFICADOR, DEPENDENCIAS:Correr migraciones HistoricalPeps1687810382203 y NewFieldsAsPhoneAndEmailToHistoricalPeps1688580236941
-- [PanelAdmin-424] PEPS Aprobación de Enrolamiento USUARIO VERIFICADOR, DEPENDENCIAS: Correr migraciones HistoricalPeps1687810382203 y NewFieldsAsPhoneAndEmailToHistoricalPeps1688580236941
-- [PanelAdmin-522] Creación modulo de notificaciones, notificaciones entre roles de ajustes masivos, creado historico de ajustes individuales. Dpendencias: correr migraciones: 1685999221761-CreateNotificationsTable.
-- [PanelAdmin-904] Al reprocesar un ajuste masivo si el proveedor no esta disponible se envia error con el siguiente mensaje: "Ocurrió un error, reintente mas tarde"
-- [PanelAdmin-928] Se mapean los mensajes Numero de deposito no existe, y se normalizan los mensajes.
-- [PanelAdmin-881] Ultimas actividades del mes se discriminan según rol.
-- [PAP-46] Se valida tiempo de expiración token PTS.
-
-## [0.5.1]
-
-- Se implementa servicio para guardar el token de PTS en caché
+- configurar nuevo endpoint para obtener numeros de cuentas por userId
+- Configurar Evento kafka para actualizar db accounts con la información de crm
 
 ## [0.5.0]
 
-- Se agrega codigo nuevo, se adiciona endpoint para eliminar tablas de codigos.
+- Se despliega todos los cambios pendientes en ambiente STG
 
 ## [0.4.0]
 
-- [PanelAdmin-882] Agregado error de PTS cuando el servicio está caido para probar el reprocesar.
-- [PanelAdmin-880] Actualización del orden de ajustes, de mas viejo a mas nuevo.
-- [PanelAdmin-663] Revision funcional ajustes monetarios, balanceador de cargas, DEPENDENCIAS: correr migraciones: 1684939303823-aflAdjustmentNewColumn, 1685452913098-aflAdjustmentRegisterNewColumnn y 1685461996055-aflFileAdjustmentsNewColumn, adicionar variables de entorno para redis y conexion M2M con auth0.
-- [PanelAdmin-830] Integración del campo tipo de código de transacción (CREDITO / DEBITO), DEPENDENCIAS: Correr migraciones AddTypeFieldToTransactionCodesEntity1686157455767 y AddActiveFieldsToTransactionCodesEntity1686157152058.
-- [PanelAdmin-865] Refactorización datos iniciales códigos de transaccion, DEPENDENCIAS: Ejecución del seeder códigos de tx.
-
-## [0.3.6]
-
-- [PanelAdmin-781] Se restaura estado de ok con errores en ajustes masivos.
-- [PanelAdmin-784] se corrige el tipo de transaccion con solo la inicial en mayúscula
-
-## [0.3.5]
-
-- [PanelAdmin-750] Se enmascaran las tarjetas con el nuevo formato.
-
-## [0.3.4]
-
-- [PanelAdmin-748] Se quitan guiones al piso de la propiedad clientStateMotiveChange en persona natural.
-
-## [0.3.3]
-
-- [PanelAdmin-705] Razón de cambio de estado según motivo, formateo número celular
-- [PanelAdmin-720] Número de tarjeta cambio de referencia desde objeto de crm.
-- [PanelAdmin-741] Archivo reportes ahora tiene estados traducidos y fechas con mes dia año, actualizados permisos.
-
-## [0.3.2]
-
-- [PanelAdmin-704] Ajuste para la obtención de la IP remota
-
-## [0.3.1]
-
-- [PanelAdmin-646] Descripción de codigos agregados a ajustes masivos.
-- [PanelAdmin-660] Solución en la restricción de repuesta del estado según rol
+- Manejo de errores de servicio accountLimitsByAccountId
 
 ## [0.3.0]
 
-- [PanelAdmin-505] Creación DB para roles y códigos de transacción.
+- Se actualiza changelog|package para pasar version a stg
 
 ## [0.2.1]
 
-- [PanelAdmin-646] Nuevo estado ajustes masivos, actualización de flujo.
+- Se actualiza changelog|package para pasar version a stg
 
 ## [0.2.0]
 
-- [PanelAdmin-493] Reporte de ajustes individuales y masivos.
+- [OFDD20-507] Consumo de evento kafka en el topico accounts.create.account.mambu, para la creacion del deposito en PTS
+- Se agregan valores de PTS al values.yaml
 
 ## [0.1.0]
 
-- [PanelAdmin-31] Creación de Scaffold Auth, Clients, Monetary Adjustments.
-- [PanelAdmin-124] Creación de ajustes monetarios.
-- [PanelAdmin-117] Actualización de ajustes monetarios.
-- [PanelAdmin-158] Consultar ajustes monetarios.
-- [PanelAdmin-108] Consultar clientes.
-- [PanelAdmin-219] Ajustes masivos rol Capturador
-- [PanelAdmin-229] Ajustes masivos rol Verificador
-- [PanelAdmin-230] Ajustes masivos rol Aprobador
+- Se publico la historia de usuario: CASHINOUT-10 -> Validar si el usuario receptor se encuentra en dale! o en alguna de las entidades aval
+- se agrega la variable PTS_REFRESH_TOKEN en el values de la carpeta cicd

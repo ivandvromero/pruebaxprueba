@@ -12,11 +12,10 @@ stages:
   - deploy_prod
 
 variables:
-  SERVICE_NAME: backoffice-service
+  SERVICE_NAME: account-service
   EKS_NAMESPACE: default
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
   GIT_DEPTH: "0"
-  ALB_LOG_ACCESS_BUCKET: dale-monitoreo-alb-access-logs-740ff91e339bf141
 
 before_script:
   - export CONTAINER_IMAGE=$DEVOPS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$SERVICE_NAME
@@ -35,6 +34,7 @@ Test:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ "/^fix/"
   image: node:18-alpine
   script:
     - apk --no-cache add python3 py3-pip
@@ -48,19 +48,19 @@ Test:
     - npm run test:cov
   artifacts:
     expire_in: 5 min
-    paths: 
+    paths:
       - coverage/
 
 sonarcloud-check:
   tags:
     - dale-devops-gitlab-runner
   stage: sonar
-  allow_failure: false
   dependencies:
     - Test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ "/^fix/"
   image:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
@@ -69,7 +69,7 @@ sonarcloud-check:
     paths:
       - .sonar/cache
   script:
-    - sonar-scanner
+    - sonar-scanner -X
 
 build_image:
   tags:
@@ -78,7 +78,7 @@ build_image:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       variables:
-          only_merge_request_event: "true"  
+          only_merge_request_event: "true"
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ "/^fix/"
   script:
@@ -94,6 +94,7 @@ build_image:
       if [ "$only_merge_request_event" == "true" ]; then
         docker rmi $CONTAINER_IMAGE:$VERSION
       fi
+
 
 push_image:
   tags:
@@ -125,80 +126,76 @@ push_image_release:
     - docker rmi $CONTAINER_IMAGE:$VERSION
     - docker rmi $CONTAINER_IMAGE:$RELEASE
 
-deploy_dev_backoffice:
+deploy_dev_accounts:
   tags:
     - dale-devops-gitlab-runner
   stage: deploy_dev
   variables:
     APP_NAME: dale-dev-compute
-    SECRET_PATH: backoffice-service/secret_config-hwsNF7
-    S3_BUCKET: dale-dev-db-s3-static-content-private-backoffice-auuos49i3iuo
-    DEV_CERTIFICATE_ARN: $DEV_CERTIFICATE_ARN
+    SECRET_PATH: account-service/secret_config-1l8qdO
+    PTS_REFRESH_TOKEN: 20
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
   script:
     - if [ -z "$TEMP1" ]; then echo "VERSION is empty"; VERSION="latest"; fi
     - apk add --no-cache curl jq python3 py-pip
     - pip3 install awscli
-    - bash .cicd/deploy-eks.sh dev $DEV_ACCOUNT_ID $AWS_DEFAULT_REGION $APP_NAME $EKS_NAMESPACE $SERVICE_NAME .cicd/helm $CONTAINER_IMAGE $VERSION $SECRET_PATH $S3_BUCKET /health $ALB_LOG_ACCESS_BUCKET $DEV_CERTIFICATE_ARN
+    - bash .cicd/deploy-eks.sh dev $DEV_ACCOUNT_ID $AWS_DEFAULT_REGION $APP_NAME $EKS_NAMESPACE $SERVICE_NAME .cicd/helm $CONTAINER_IMAGE $VERSION $SECRET_PATH $PTS_REFRESH_TOKEN
 
-deploy_qa_backoffice:
+deploy_qa_account:
   tags:
     - dale-devops-gitlab-runner
   stage: deploy_qa
   variables:
     APP_NAME: dale-qa-compute
-    SECRET_PATH: backoffice-service/secret_config-kNggjj
-    S3_BUCKET: dale-dev-db-s3-static-content-private-backoffice-auuos49i3iuo
-    QA_CERTIFICATE_ARN: $QA_CERTIFICATE_ARN
+    SECRET_PATH: account-service/secret_config-WBIfUS
+    PTS_REFRESH_TOKEN: 20
   script:
     - echo "Deploy to qa server"
     - if [ -z "$TEMP1" ]; then echo "VERSION is empty"; VERSION="latest"; fi
     - apk add --no-cache curl jq python3 py-pip
     - pip3 install awscli
-    - bash .cicd/deploy-eks.sh qa $QA_ACCOUNT_ID $AWS_DEFAULT_REGION $APP_NAME $EKS_NAMESPACE $SERVICE_NAME .cicd/helm $CONTAINER_IMAGE $CI_COMMIT_SHORT_SHA $SECRET_PATH $S3_BUCKET /health $ALB_LOG_ACCESS_BUCKET $QA_CERTIFICATE_ARN
+    - bash .cicd/deploy-eks.sh qa $QA_ACCOUNT_ID $AWS_DEFAULT_REGION $APP_NAME $EKS_NAMESPACE $SERVICE_NAME .cicd/helm $CONTAINER_IMAGE $CI_COMMIT_SHORT_SHA $SECRET_PATH $PTS_REFRESH_TOKEN
   environment:
     name: qa
   when: manual
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ "/^release/"
 
-deploy_stg_backoffice:
+deploy_stg_account:
   tags:
     - dale-devops-gitlab-runner
   stage: deploy_stg
   variables:
     APP_NAME: dale-stg-compute
-    SECRET_PATH: backoffice-service/secret_config-kx94Wg
-    S3_BUCKET: dale-stg-db-s3-static-content-private-backoffice-3wblphj3k7a1
-    STG_CERTIFICATE_ARN: $STG_CERTIFICATE_ARN
+    SECRET_PATH: account-service/secret_config-ZYVwma
+    PTS_REFRESH_TOKEN: 20
   script:
     - echo "Deploy to stg server"
     - if [ -z "$TEMP1" ]; then echo "VERSION is empty"; VERSION="latest"; fi
     - apk add --no-cache curl jq python3 py-pip
     - pip3 install awscli
-    - bash .cicd/deploy-eks.sh stg $STG_ACCOUNT_ID $AWS_DEFAULT_REGION $APP_NAME $EKS_NAMESPACE $SERVICE_NAME .cicd/helm $CONTAINER_IMAGE $CI_COMMIT_SHORT_SHA $SECRET_PATH $S3_BUCKET /health $ALB_LOG_ACCESS_BUCKET $STG_CERTIFICATE_ARN
+    - bash .cicd/deploy-eks.sh stg $STG_ACCOUNT_ID $AWS_DEFAULT_REGION $APP_NAME $EKS_NAMESPACE $SERVICE_NAME .cicd/helm $CONTAINER_IMAGE $CI_COMMIT_SHORT_SHA $SECRET_PATH $PTS_REFRESH_TOKEN
   environment:
     name: stg
   when: manual
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ "/^release/"
 
-deploy_prod_backoffice:
+deploy_prod_account:
   tags:
     - dale-devops-gitlab-runner
   stage: deploy_prod
   variables:
     APP_NAME: dale-prod-compute
-    SECRET_PATH: backoffice-service/secret_config-0QeRfL
-    S3_BUCKET: dale-prod-db-s3-static-content-private-backoffice-53ildoadx0he
-    STG_CERTIFICATE_ARN: $PROD_CERTIFICATE_ARN
+    SECRET_PATH: account-service/secret_config-b8Mv9v
+    PTS_REFRESH_TOKEN: 20
   script:
     - echo "Deploy to prod server"
     - if [ -z "$TEMP1" ]; then echo "VERSION is empty"; VERSION="latest"; fi
     - apk add --no-cache curl jq python3 py-pip
     - pip3 install awscli
-    - bash .cicd/deploy-eks.sh prod $PROD_ACCOUNT_ID $AWS_DEFAULT_REGION $APP_NAME $EKS_NAMESPACE $SERVICE_NAME .cicd/helm $CONTAINER_IMAGE $CI_COMMIT_SHORT_SHA $SECRET_PATH $S3_BUCKET /health $ALB_LOG_ACCESS_BUCKET $PROD_CERTIFICATE_ARN
+    - bash .cicd/deploy-eks.sh prod $PROD_ACCOUNT_ID $AWS_DEFAULT_REGION $APP_NAME $EKS_NAMESPACE $SERVICE_NAME .cicd/helm $CONTAINER_IMAGE $CI_COMMIT_SHORT_SHA $SECRET_PATH $PTS_REFRESH_TOKEN
   environment:
     name: prod
   when: manual

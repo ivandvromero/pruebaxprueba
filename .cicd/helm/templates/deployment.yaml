@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "backoffice-service.fullname" . }}
+  name: {{ include "account-service.fullname" . }}
   labels:
-    {{- include "backoffice-service.labels" . | nindent 4 }}
+    {{- include "account-service.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "backoffice-service.selectorLabels" . | nindent 6 }}
+      {{- include "account-service.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,13 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "backoffice-service.selectorLabels" . | nindent 8 }}
+        {{- include "account-service.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "backoffice-service.serviceAccountName" . }}
+      serviceAccountName: {{ include "account-service.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -37,7 +37,7 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-          env:          
+          env:
           {{- range $key, $val := .Values.env }}
             - name: {{ $key }}
               value: {{ $val | quote }}
@@ -50,22 +50,22 @@ spec:
                   name: {{  $dot.Chart.Name }}
                   key: {{ . }}
           {{- end }}
-          # livenessProbe:
-          #   httpGet:
-          #     path: /service/health
-          #     port: 3000
-          #     scheme: HTTPS
-          #   initialDelaySeconds: 60
-          #   periodSeconds: 10
-          #   timeoutSeconds: 5
-          # readinessProbe:
-          #   httpGet:
-          #     path: /service/health
-          #     port: 3000
-          #     scheme: HTTPS
-          #   initialDelaySeconds: 60
-          #   periodSeconds: 10
-          #   timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /service/health
+              port: 3000
+              scheme: HTTPS
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /service/health
+              port: 3000
+              scheme: HTTPS
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
