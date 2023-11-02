@@ -1,0 +1,72 @@
+---
+apiVersion: vpcresources.k8s.aws/v1beta1
+kind: SecurityGroupPolicy
+metadata:
+  name: {{ .Values.nameOverride }}-sg-policy
+  namespace: {{ .Values.namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      role: {{ .Values.nameOverride }}-role
+  securityGroups:
+    {{- with .Values.sgIds }}
+    groupIds:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.nameOverride }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.minPods }}
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.nameOverride }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Values.nameOverride }}
+        role: {{ .Values.nameOverride }}-role
+    spec:
+      volumes:
+        - name: appsettings-volume
+          configMap:
+            name: {{ .Values.nameOverride }}-appsettings
+      containers:
+      - image: {{ .Values.ecr }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
+        name: {{ .Values.nameOverride }}
+        imagePullPolicy: Always
+        volumeMounts:
+            - name: appsettings-volume
+              mountPath: /app/appsettings.{{ .Values.environment }}.json
+              subPath: appsettings.{{ .Values.environment }}.json
+        ports:
+        - containerPort: 5001
+        env:
+            - name: TZ
+              value: America/Bogota
+        resources:
+              requests:
+                memory: 100Mi
+                cpu: 30m
+              limits:
+                memory: 200Mi
+                cpu: 100m
+      dnsPolicy: Default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.nameOverride }}
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+      protocol: TCP
+  type: {{ .Values.service.type }}
+  selector:
+    app.kubernetes.io/name: {{ .Values.nameOverride }}

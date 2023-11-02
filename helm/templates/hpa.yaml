@@ -1,0 +1,21 @@
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata: 
+  name: {{ .Values.nameOverride }}
+  namespace: {{ .Values.namespace }}
+spec: 
+  maxReplicas: {{ .Values.maxPods }} 
+  minReplicas: {{ .Values.minPods }} 
+  scaleTargetRef: 
+    apiVersion: apps/v1 
+    kind: Deployment 
+    name: {{ .Values.nameOverride }}
+  metrics: 
+  - type: Resource 
+    resource:
+      name: memory
+      targetAverageUtilization: 75
+  - type: Resource 
+    resource:
+      name: cpu
+      targetAverageUtilization: 75

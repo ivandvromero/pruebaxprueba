@@ -1,0 +1,545 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.nameOverride }}-appsettings
+  namespace: {{ .Values.namespace }}
+data:
+  appsettings.Debug.json: |-
+    {
+      "Logging": {
+        "LogLevel": {
+          "Default": "Debug",
+          "Microsoft": "Warning",
+          "System": "Warning",
+          "Microsoft.Hosting.Lifetime": "Warning"
+        },
+        "LogSystem": "C:\\FilesProcess\\Logs"
+      },
+
+      "AwsSettings": {
+        "Profile": "dale",
+        "Region": "us-east-2",
+        "AuthType": "Credentials",
+        "AWSAccessKey": "AKIAJY5U6HZIINQD2KQA",
+        "AWSSecretKey": "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"
+      },
+
+      "DbSecrets": {
+        "Host": "k7-dev.cwcavfafxyga.us-east-2.rds.amazonaws.com",
+        "DatabaseName": "PayAval",
+        "Username": "admin",
+        "Password": "gPJh78{R*w_XX4t!",
+        "Engine": "",
+        "Port": 1433,
+        "DbInstanceIdentifier": null,
+        "NewName": ""
+      },
+
+      "SecretsList": [
+        {
+          "SecretName": "dev/avalpay-db",
+          "SettingNodeName": "DbSecrets"
+        },
+        {
+          "SecretName": "dev/novopayment",
+          "SettingNodeName": "Novopayment"
+        }
+      ],
+
+      "Serilog": {
+        "LogGroup": "dev-k7-debit-card-services",
+        "Region": "us-east-2",
+        "EnabledLogsCloud": "true"
+      },
+      
+      "Novopayment": {
+        "ClientId": "VqqMa1Yf6SVUqwjajBzTZytDt1YGxwzK",
+        "ClientSecret": "1vLGdMGx3yTqZY1Z",
+        "GrantType": "client_credentials",
+        "TenantId":"b7f1e3cc-ea0a-4ea9-b918-f85d7295fa5c"
+      },
+
+      "CertificateDale": {
+        "CertificatePathJWEPrivate": "/app/cer/dale\\dale-key-jwe.pem",
+        "CertificatePathJWEPublic": "/app/cer/dale\\dale-pub-jwe.pem",
+        "CertificatePathJWSPrivate": "/app/cer/dale\\dale-key-jws.pem",
+        "CertificatePathJWSPublic": "/app/cer/dale\\dale-pub-jws.pem"
+      },
+      
+      "CertificateDaleVirtual2Physical": {
+        "CertificatePathJWEPrivate": "/app/cer/virtual-2-physical-dale-key-jwe.pem",
+        "CertificatePathJWEPublic": "/app/cer/virtual-2-physical-dale-pub-jwe.pem",
+        "CertificatePathJWSPrivate": "/app/cer/virtual-2-physical-dale-key-jws.pem",
+        "CertificatePathJWSPublic": "/app/cer/virtual-2-physical-dale-pub-jws.pem",
+        "CertificatePathNovoJWEPublic": "/app/cer/virtual-2-physical-novo-pub-jwe.pem"
+      },
+
+      "CertificateNovo": {
+        "CertificatePathJWE": "/app/cer/novo\\co-dale-issuer-jwe-crt-pub.pem",
+        "CertificatePathJWS": "/app/cer/novo\\co-dale-issuer-jws-crt-pub.pem",
+        "ClientId": "co-dale"
+      },
+
+      "ApiUrls": {
+        "CoreApi": "https://core-api-dev.mdapps-staging.com",
+        "NovopaymentTokenizationApi": "https://cert-api.novopayment.com",
+        "CertificatePath": "/app/cer/novo\\exp.current.private.pfx",
+        "CertificatePassword": "123456",
+        "RetryAttempts": 3,
+        "RetryIntervalInSeconds": 3
+      },
+
+      "DynamoHealthCheck": [
+        "tokenization-notifications",
+        "tokenization-user-tokens"
+      ],
+
+      "PrefixDynamoDB": "dev-k7-",
+
+      "RabbiMqSettings": {
+        "RabbitMQServiceBusConnectionString": "amqps://{0}:{1}@{2}:{3}/",
+        "Exchange": "amq.topic",
+        "PrefetchCount": 5,
+        "UserName": "k7-development",
+        "Password": "6JAnfND8smwEmLaM",
+        "Hostname": "b-7a2787c7-e355-4948-b29e-2ff2941bb49a.mq.us-east-2.amazonaws.com",
+        "Port": "5671"
+      },
+      "QueuesNames": {
+        "QueueHandlingFee": "QueueHandlingFee",
+        "QueueCashBackEvent": "QueueCashBackEvent"
+      },
+      "Redis": {
+        "Endpoint": "dev-k7-redis-02-001.pvurrs.0001.use2.cache.amazonaws.com:6379",
+        "ExpirationSeconds": 43200
+      }
+    }
+  appsettings.Development.json: |-
+    {
+      "Logging": {
+        "LogLevel": {
+          "Default": "Debug",
+          "Microsoft": "Warning",
+          "System": "Warning",
+          "Microsoft.Hosting.Lifetime": "Warning"
+        },
+        "LogSystem": ""
+      },
+
+      "AwsSettings": {
+        "Region": "us-east-2",
+        "AuthType": "IAMRole",
+        "AWSAccessKey": "",
+        "AWSSecretKey": ""
+      },
+
+      "DbSecrets": {
+        "Host": "",
+        "DatabaseName": "",
+        "Username": "",
+        "Password": "",
+        "Engine": "",
+        "Port": 0,
+        "DbInstanceIdentifier": null,
+        "NewName": ""
+      },
+
+      "SecretsList": [
+        {
+          "SecretName": "dev/avalpay-db",
+          "SettingNodeName": "DbSecrets"
+        },
+        {
+          "SecretName": "dev/k7-broker",
+          "SettingNodeName": "RabbiMqSettings"
+        },
+        {
+          "SecretName": "dev/novopayment",
+          "SettingNodeName": "Novopayment"
+        }
+      ],
+
+      "Serilog": {
+        "LogGroup": "dev-k7-debit-card-services",
+        "Region": "us-east-2",
+        "EnabledLogsCloud": "true"
+      },
+      
+      "Novopayment": {
+        "ClientId": "",
+        "ClientSecret": "",
+        "GrantType": "",
+        "TenantId":""
+      },
+
+
+      "CertificateDale": {
+        "CertificatePathJWEPrivate": "/app/cer/dale-key-jwe.pem",
+        "CertificatePathJWEPublic": "/app/cer/dale-pub-jwe.pem",
+        "CertificatePathJWSPrivate": "/app/cer/dale-key-jws.pem",
+        "CertificatePathJWSPublic": "/app/cer/dale-pub-jws.pem"
+      },
+      
+      "CertificateDaleVirtual2Physical": {
+        "CertificatePathJWEPrivate": "/app/cer/virtual-2-physical-dale-key-jwe.pem",
+        "CertificatePathJWEPublic": "/app/cer/virtual-2-physical-dale-pub-jwe.pem",
+        "CertificatePathJWSPrivate": "/app/cer/virtual-2-physical-dale-key-jws.pem",
+        "CertificatePathJWSPublic": "/app/cer/virtual-2-physical-dale-pub-jws.pem",
+        "CertificatePathNovoJWEPublic": "/app/cer/virtual-2-physical-novo-pub-jwe.pem"
+      },
+
+      "CertificateNovo": {
+        "CertificatePathJWE": "/app/cer/co-dale-issuer-jwe-crt-pub.pem",
+        "CertificatePathJWS": "/app/cer/co-dale-issuer-jws-crt-pub.pem",
+        "ClientId": "co-dale"
+      },
+
+      "ApiUrls": {
+        "CoreApi": "https://core-api-dev.mdapps-staging.com",
+        "NovopaymentTokenizationApi": "https://cert-api.novopayment.com",
+        "CertificatePath": "/app/cer/exp.current.private.pfx",
+        "CertificatePassword": "123456",
+        "CertificatePasswordPath": "",
+        "RetryAttempts": 3,
+        "RetryIntervalInSeconds": 3
+      },
+
+      "DynamoHealthCheck": [
+        "tokenization-notifications",
+        "tokenization-user-tokens"
+      ],
+
+      "PrefixDynamoDB": "dev-k7-",
+      "NewRelic.AppName": "dev-k7-DebitCardApi",
+
+      "RabbiMqSettings": {
+        "RabbitMQServiceBusConnectionString": "amqps://{0}:{1}@{2}:{3}/",
+        "Exchange": "amq.topic",
+        "PrefetchCount": 6  ,
+        "hostname": "",
+        "port": "",
+        "username": "",
+        "password": ""
+      },      
+      "QueuesNames": {
+        "QueueHandlingFee": "QueueHandlingFee",
+        "QueueCashBackEvent": "QueueCashBackEvent"
+      },
+      "Redis": {
+        "Endpoint": "dev-k7-redis-02-001.pvurrs.0001.use2.cache.amazonaws.com:6379",
+        "ExpirationSeconds": 43200
+      }
+
+    }
+  appsettings.Testing.json: |-
+    {
+      "Logging": {
+        "LogLevel": {
+          "Default": "Debug",
+          "Microsoft": "Warning",
+          "System": "Warning",
+          "Microsoft.Hosting.Lifetime": "Warning"
+        },
+        "LogSystem": ""
+      },
+      "AwsSettings": {
+        "Region": "us-east-2",
+        "AuthType": "IAMRole", // Possible Values: IAMRole or Credentials
+        "AWSAccessKey": "", // Only specify if AuthType = Credentials
+        "AWSSecretKey": "" // Only specify if AuthType = Credentials
+      },
+      "DbSecrets": {
+        "Host": "",
+        "DatabaseName": "",
+        "Username": "",
+        "Password": "",
+        "Engine": "",
+        "Port": 0,
+        "DbInstanceIdentifier": null,
+        "NewName": ""
+      },
+      "SecretsList": [
+        {
+          "SecretName": "qa/avalpay-db",
+          "SettingNodeName": "DbSecrets"
+        },
+        {
+          "SecretName": "qa/k7-broker",
+          "SettingNodeName": "RabbiMqSettings"
+        },
+        {
+          "SecretName": "qa/novopayment",
+          "SettingNodeName": "Novopayment"
+        }
+      ],
+      "Serilog": {
+        "LogGroup": "qa-k7-debit-card-services",
+        "Region": "us-east-2",
+        "EnabledLogsCloud": "true"
+      },
+      "Novopayment": {
+        "ClientId": "",
+        "ClientSecret": "",
+        "GrantType": "",
+        "TenantId":""
+      },
+      "CertificateDale": {
+        "CertificatePathJWEPrivate": "/app/cer/dale-key-jwe.pem",
+        "CertificatePathJWEPublic": "/app/cer/dale-pub-jwe.pem",
+        "CertificatePathJWSPrivate": "/app/cer/dale-key-jws.pem",
+        "CertificatePathJWSPublic": "/app/cer/dale-pub-jws.pem"
+      },
+      "CertificateDaleVirtual2Physical": {
+        "CertificatePathJWEPrivate": "/app/cer/virtual-2-physical-dale-key-jwe.pem",
+        "CertificatePathJWEPublic": "/app/cer/virtual-2-physical-dale-pub-jwe.pem",
+        "CertificatePathJWSPrivate": "/app/cer/virtual-2-physical-dale-key-jws.pem",
+        "CertificatePathJWSPublic": "/app/cer/virtual-2-physical-dale-pub-jws.pem",
+        "CertificatePathNovoJWEPublic": "/app/cer/virtual-2-physical-novo-pub-jwe.pem"
+      },
+      "CertificateNovo": {
+        "CertificatePathJWE": "/app/cer/co-dale-issuer-jwe-crt-pub.pem",
+        "CertificatePathJWS": "/app/cer/co-dale-issuer-jws-crt-pub.pem",
+        "ClientId": "co-dale"
+      },
+      "ApiUrls": {
+        "CoreApi": "https://core-api-qa.mdapps-staging.com",
+        "NovopaymentTokenizationApi": "https://cert-api.novopayment.com",
+        "CertificatePath": "/app/cer/exp.current.private.pfx",
+        "CertificatePassword": "123456",
+        "CertificatePasswordPath": "",
+        "RetryAttempts": 3,
+        "RetryIntervalInSeconds": 3
+      },
+      "DynamoHealthCheck": [
+        "tokenization-notifications",
+        "tokenization-user-tokens"
+      ],
+      "PrefixDynamoDB": "qa-k7-",
+      "NewRelic.AppName": "qa-k7-DebitCardApi",
+
+      "RabbiMqSettings": {
+        "RabbitMQServiceBusConnectionString": "amqps://{0}:{1}@{2}:{3}/",
+        "Exchange": "amq.topic",
+        "PrefetchCount": 6  ,
+        "hostname": "",
+        "port": "",
+        "username": "",
+        "password": ""
+      },      
+      "QueuesNames": {
+        "QueueHandlingFee": "QueueHandlingFee",
+        "QueueCashBackEvent": "QueueCashBackEvent"
+      },
+      "Redis": {
+        "Endpoint": "qa-k7-redis-02-001.pvurrs.0001.use2.cache.amazonaws.com:6379",
+        "ExpirationSeconds": 43200
+      }
+    }
+  appsettings.Staging.json: |-
+    {
+      "Logging": {
+        "LogLevel": {
+          "Default": "Debug",
+          "Microsoft": "Warning",
+          "System": "Warning",
+          "Microsoft.Hosting.Lifetime": "Warning"
+        },
+        "LogSystem": ""
+      },
+      "AwsSettings": {
+        "Region": "us-east-2",
+        "AuthType": "IAMRole",
+        "AWSAccessKey": "",
+        "AWSSecretKey": ""
+      },
+      "DbSecrets": {
+        "Host": "",
+        "DatabaseName": "",
+        "Username": "",
+        "Password": "",
+        "Engine": "",
+        "Port": 0,
+        "DbInstanceIdentifier": null,
+        "NewName": ""
+      },
+      "SecretsList": [
+        {
+          "SecretName": "staging/avalpay-db",
+          "SettingNodeName": "DbSecrets"
+        },
+        {
+          "SecretName": "staging/k7-broker",
+          "SettingNodeName": "RabbiMqSettings"
+        },
+        {
+          "SecretName": "staging/novopayment",
+          "SettingNodeName": "Novopayment"
+        }
+      ],
+      "Serilog": {
+        "LogGroup": "stg-k7-debit-card-services",
+        "Region": "us-east-2",
+        "EnabledLogsCloud": "true"
+      },
+      "Novopayment": {
+        "ClientId": "",
+        "ClientSecret": "",
+        "GrantType": "",
+        "TenantId":""
+      },
+      "CertificateDale": {
+        "CertificatePathJWEPrivate": "/app/cer/dale-key-jwe.pem",
+        "CertificatePathJWEPublic": "/app/cer/dale-pub-jwe.pem",
+        "CertificatePathJWSPrivate": "/app/cer/dale-key-jws.pem",
+        "CertificatePathJWSPublic": "/app/cer/dale-pub-jws.pem"
+      },
+      "CertificateDaleVirtual2Physical": {
+        "CertificatePathJWEPrivate": "/app/cer/virtual-2-physical-dale-key-jwe.pem",
+        "CertificatePathJWEPublic": "/app/cer/virtual-2-physical-dale-pub-jwe.pem",
+        "CertificatePathJWSPrivate": "/app/cer/virtual-2-physical-dale-key-jws.pem",
+        "CertificatePathJWSPublic": "/app/cer/virtual-2-physical-dale-pub-jws.pem",
+        "CertificatePathNovoJWEPublic": "/app/cer/virtual-2-physical-novo-pub-jwe.pem"
+      },
+      "CertificateNovo": {
+        "CertificatePathJWE": "/app/cer/co-dale-issuer-jwe-crt-pub.pem",
+        "CertificatePathJWS": "/app/cer/co-dale-issuer-jws-crt-pub.pem",
+        "ClientId": "co-dale"
+      },
+      "ApiUrls": {
+        "CoreApi": "https://app.mdapps-staging.com",
+        "NovopaymentTokenizationApi": "https://cert-api.novopayment.com",
+        "CertificatePath": "/app/cer/exp.current.private.pfx",
+        "CertificatePassword": "123456",
+        "CertificatePasswordPath": "",
+        "RetryAttempts": 3,
+        "RetryIntervalInSeconds": 3
+      },
+      "DynamoHealthCheck": [
+        "tokenization-notifications",
+        "tokenization-user-tokens"
+      ],
+      "PrefixDynamoDB": "staging-k7-",
+      "NewRelic.AppName": "staging-k7-DebitCardApi",
+
+      "RabbiMqSettings": {
+        "RabbitMQServiceBusConnectionString": "amqps://{0}:{1}@{2}:{3}/",
+        "Exchange": "amq.topic",
+        "PrefetchCount": 6  ,
+        "hostname": "",
+        "port": "",
+        "username": "",
+        "password": ""
+      },      
+      "QueuesNames": {
+        "QueueHandlingFee": "QueueHandlingFee",
+        "QueueCashBackEvent": "QueueCashBackEvent"
+      },
+      "Redis": {
+        "Endpoint": "staging-k7-redis.pvurrs.ng.0001.use2.cache.amazonaws.com:6379",
+        "ExpirationSeconds": 43200
+      }
+    }
+  appsettings.Production.json: |-
+    {
+      "Logging": {
+        "LogLevel": {
+          "Default": "Debug",
+          "Microsoft": "Warning",
+          "System": "Warning",
+          "Microsoft.Hosting.Lifetime": "Warning"
+        },
+        "LogSystem": ""
+      },
+      "AwsSettings": {
+        "Region": "us-east-2",
+        "AuthType": "IAMRole",
+        "AWSAccessKey": "", 
+        "AWSSecretKey": ""
+      },
+      "DbSecrets": {
+        "Host": "",
+        "DatabaseName": "",
+        "Username": "",
+        "Password": "",
+        "Engine": "",
+        "Port": 0,
+        "DbInstanceIdentifier": null,
+        "NewName": ""
+      },
+      "SecretsList": [
+        {
+          "SecretName": "prod/avalpay-db",
+          "SettingNodeName": "DbSecrets"
+        },
+        {
+          "SecretName": "prod/k7-broker",
+          "SettingNodeName": "RabbiMqSettings"
+        },
+        {
+          "SecretName": "prod/novopayment",
+          "SettingNodeName": "Novopayment"
+        }
+      ],
+      "Serilog": {
+        "LogGroup": "prod-k7-debit-card-services",
+        "Region": "us-east-2",
+        "EnabledLogsCloud": "true"
+      },
+      "Novopayment": {
+        "ClientId": "",
+        "ClientSecret": "",
+        "GrantType": "",
+        "TenantId":""
+      },
+      "CertificateDale": {
+        "CertificatePathJWEPrivate": "/app/cer/dale-key-jwe.pem",
+        "CertificatePathJWEPublic": "/app/cer/dale-pub-jwe.pem",
+        "CertificatePathJWSPrivate": "/app/cer/dale-key-jws.pem",
+        "CertificatePathJWSPublic": "/app/cer/dale-pub-jws.pem"
+      },
+      "CertificateDaleVirtual2Physical": {
+        "CertificatePathJWEPrivate": "/app/cer/virtual-2-physical-dale-key-jwe.pem",
+        "CertificatePathJWEPublic": "/app/cer/virtual-2-physical-dale-pub-jwe.pem",
+        "CertificatePathJWSPrivate": "/app/cer/virtual-2-physical-dale-key-jws.pem",
+        "CertificatePathJWSPublic": "/app/cer/virtual-2-physical-dale-pub-jws.pem",
+        "CertificatePathNovoJWEPublic": "/app/cer/virtual-2-physical-novo-pub-jwe.pem"
+      },
+      "CertificateNovo": {
+        "CertificatePathJWE": "/app/cer/co-dale-issuer-jwe-crt-pub.pem",
+        "CertificatePathJWS": "/app/cer/co-dale-issuer-jws-crt-pub.pem",
+        "ClientId": "co-dale"
+      },
+      "ApiUrls": {
+        "CoreApi": "https://app.mdapps-production.com",
+        "NovopaymentTokenizationApi": "https://prod-api.novopayment.com",
+        "CertificatePath": "/app/cer/exp.current.private.pfx",
+        "CertificatePassword": "123456",
+        "RetryAttempts": 3,
+        "RetryIntervalInSeconds": 3
+      },
+      "DynamoHealthCheck": [
+        "tokenization-notifications",
+        "tokenization-user-tokens"
+      ],
+      "PrefixDynamoDB": "prod-k7-",
+      "NewRelic.AppName": "prod-k7-DebitCardApi",
+
+      "RabbiMqSettings": {
+        "RabbitMQServiceBusConnectionString": "amqps://{0}:{1}@{2}:{3}/",
+        "Exchange": "amq.topic",
+        "PrefetchCount": 6  ,
+        "hostname": "",
+        "port": "",
+        "username": "",
+        "password": ""
+      },      
+      "QueuesNames": {
+        "QueueHandlingFee": "QueueHandlingFee",
+        "QueueCashBackEvent": "QueueCashBackEvent"
+      },
+      "Redis": {
+        "Endpoint": "prod-k7-redis.mdapps-production.com",
+        "ExpirationSeconds": 43200
+      }
+    }

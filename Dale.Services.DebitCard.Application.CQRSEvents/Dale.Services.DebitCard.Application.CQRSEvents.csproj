@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dale.Extensions.Logging" Version="1.0.8" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dale.Services.DebitCard.Domain.Core\Dale.Services.DebitCard.Domain.Core.csproj" />
+    <ProjectReference Include="..\Dale.Services.DebitCard.Infraestructure.Extensions\Dale.Services.DebitCard.Infraestructure.Extensions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Dale.Framework.MessageBroker.RabbitMQ">
+      <HintPath>obj\Dale.Framework.MessageBroker.RabbitMQ.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\CashBack.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CashBack.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\CashBack.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CashBack.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

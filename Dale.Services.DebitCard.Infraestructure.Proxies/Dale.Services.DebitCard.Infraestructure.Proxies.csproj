@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="Dale.Extensions.Logging" Version="1.0.8" />
+	  <PackageReference Include="AWSSDK.Core" Version="3.7.0.41" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dale.Services.DebitCard.Domain.Core\Dale.Services.DebitCard.Domain.Core.csproj" />
+    <ProjectReference Include="..\Dale.Services.DebitCard.Infraestructure.Extensions\Dale.Services.DebitCard.Infraestructure.Extensions.csproj" />
+  </ItemGroup>
+
+</Project>

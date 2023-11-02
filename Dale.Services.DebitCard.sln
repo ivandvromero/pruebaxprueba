@@ -1,0 +1,108 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31321.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01.Presentation", "01.Presentation", "{1FD42FD7-40C5-498B-9E98-90C53666059F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dale.Services.DebitCard.API", "Dale.Services.DebitCard.API\Dale.Services.DebitCard.API.csproj", "{7F7D0066-2B5E-40F6-A082-FE1FEC228FBB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02.Application", "02.Application", "{FBE0E496-798D-460D-9816-74451C003919}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dale.Services.DebitCard.Application.CQRSCommands", "Dale.Services.DebitCard.Application.CQRSCommands\Dale.Services.DebitCard.Application.CQRSCommands.csproj", "{EBBC11DA-C711-4493-8166-19FC7149EEC4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dale.Services.DebitCard.Application.CQRSQueries", "Dale.Services.DebitCard.Application.CQRSQueries\Dale.Services.DebitCard.Application.CQRSQueries.csproj", "{7AE5C6D5-9A19-49BF-8D6F-7CD7DE77300C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dale.Services.DebitCard.Application.Services", "Dale.Services.DebitCard.Application.Services\Dale.Services.DebitCard.Application.Services.csproj", "{6F1E2523-55FC-436C-AF83-C5A42478C35C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03.Infraestructure", "03.Infraestructure", "{5A857112-A112-45BA-9549-CD6E13D759AE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dale.Services.DebitCard.Infraestructure.Extensions", "Dale.Services.DebitCard.Infraestructure.Extensions\Dale.Services.DebitCard.Infraestructure.Extensions.csproj", "{D14993FE-27EA-4C07-83F6-A0919D48F09D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dale.Services.DebitCard.Infaestructure.Persistence", "Dale.Services.DebitCard.Infaestructure.Persistence\Dale.Services.DebitCard.Infaestructure.Persistence.csproj", "{B1FA752A-7797-4808-A32D-A4832F9C286C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dale.Services.DebitCard.Infraestructure.Proxies", "Dale.Services.DebitCard.Infraestructure.Proxies\Dale.Services.DebitCard.Infraestructure.Proxies.csproj", "{74DB7709-51DC-45D4-933B-6D4FBDEAF59F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dale.Services.DebitCard.Infaestructure", "Dale.Services.DebitCard.Infaestructure\Dale.Services.DebitCard.Infaestructure.csproj", "{5EF02503-FB8F-4316-864C-81B6893692A9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04.Domain", "04.Domain", "{58D772BE-8FD8-4CAB-B325-2D85E8D6906A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dale.Services.DebitCard.Domain.Core", "Dale.Services.DebitCard.Domain.Core\Dale.Services.DebitCard.Domain.Core.csproj", "{CC7CFB34-3463-4E05-9E49-096CEA5980F0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "05.Tests", "05.Tests", "{E4074EB8-17B5-4F0A-9542-33D471CC4077}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dale.Services.DebitCard.Tests", "Dale.Services.DebitCard.Tests\Dale.Services.DebitCard.Tests.csproj", "{016B02A2-8E6E-45B9-979F-EA3AACC60DB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dale.Services.DebitCard.Application.CQRSEvents", "Dale.Services.DebitCard.Application.CQRSEvents\Dale.Services.DebitCard.Application.CQRSEvents.csproj", "{0DF98396-58BB-433A-A9DE-66555EF32B20}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7F7D0066-2B5E-40F6-A082-FE1FEC228FBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F7D0066-2B5E-40F6-A082-FE1FEC228FBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F7D0066-2B5E-40F6-A082-FE1FEC228FBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F7D0066-2B5E-40F6-A082-FE1FEC228FBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBBC11DA-C711-4493-8166-19FC7149EEC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBBC11DA-C711-4493-8166-19FC7149EEC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBBC11DA-C711-4493-8166-19FC7149EEC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBBC11DA-C711-4493-8166-19FC7149EEC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AE5C6D5-9A19-49BF-8D6F-7CD7DE77300C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AE5C6D5-9A19-49BF-8D6F-7CD7DE77300C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AE5C6D5-9A19-49BF-8D6F-7CD7DE77300C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AE5C6D5-9A19-49BF-8D6F-7CD7DE77300C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F1E2523-55FC-436C-AF83-C5A42478C35C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F1E2523-55FC-436C-AF83-C5A42478C35C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F1E2523-55FC-436C-AF83-C5A42478C35C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F1E2523-55FC-436C-AF83-C5A42478C35C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D14993FE-27EA-4C07-83F6-A0919D48F09D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D14993FE-27EA-4C07-83F6-A0919D48F09D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D14993FE-27EA-4C07-83F6-A0919D48F09D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D14993FE-27EA-4C07-83F6-A0919D48F09D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1FA752A-7797-4808-A32D-A4832F9C286C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1FA752A-7797-4808-A32D-A4832F9C286C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1FA752A-7797-4808-A32D-A4832F9C286C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1FA752A-7797-4808-A32D-A4832F9C286C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74DB7709-51DC-45D4-933B-6D4FBDEAF59F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74DB7709-51DC-45D4-933B-6D4FBDEAF59F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74DB7709-51DC-45D4-933B-6D4FBDEAF59F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74DB7709-51DC-45D4-933B-6D4FBDEAF59F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EF02503-FB8F-4316-864C-81B6893692A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EF02503-FB8F-4316-864C-81B6893692A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EF02503-FB8F-4316-864C-81B6893692A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EF02503-FB8F-4316-864C-81B6893692A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC7CFB34-3463-4E05-9E49-096CEA5980F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC7CFB34-3463-4E05-9E49-096CEA5980F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC7CFB34-3463-4E05-9E49-096CEA5980F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC7CFB34-3463-4E05-9E49-096CEA5980F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{016B02A2-8E6E-45B9-979F-EA3AACC60DB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{016B02A2-8E6E-45B9-979F-EA3AACC60DB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{016B02A2-8E6E-45B9-979F-EA3AACC60DB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{016B02A2-8E6E-45B9-979F-EA3AACC60DB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DF98396-58BB-433A-A9DE-66555EF32B20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DF98396-58BB-433A-A9DE-66555EF32B20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DF98396-58BB-433A-A9DE-66555EF32B20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DF98396-58BB-433A-A9DE-66555EF32B20}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7F7D0066-2B5E-40F6-A082-FE1FEC228FBB} = {1FD42FD7-40C5-498B-9E98-90C53666059F}
+		{EBBC11DA-C711-4493-8166-19FC7149EEC4} = {FBE0E496-798D-460D-9816-74451C003919}
+		{7AE5C6D5-9A19-49BF-8D6F-7CD7DE77300C} = {FBE0E496-798D-460D-9816-74451C003919}
+		{6F1E2523-55FC-436C-AF83-C5A42478C35C} = {FBE0E496-798D-460D-9816-74451C003919}
+		{D14993FE-27EA-4C07-83F6-A0919D48F09D} = {5A857112-A112-45BA-9549-CD6E13D759AE}
+		{B1FA752A-7797-4808-A32D-A4832F9C286C} = {5A857112-A112-45BA-9549-CD6E13D759AE}
+		{74DB7709-51DC-45D4-933B-6D4FBDEAF59F} = {5A857112-A112-45BA-9549-CD6E13D759AE}
+		{5EF02503-FB8F-4316-864C-81B6893692A9} = {5A857112-A112-45BA-9549-CD6E13D759AE}
+		{CC7CFB34-3463-4E05-9E49-096CEA5980F0} = {58D772BE-8FD8-4CAB-B325-2D85E8D6906A}
+		{016B02A2-8E6E-45B9-979F-EA3AACC60DB4} = {E4074EB8-17B5-4F0A-9542-33D471CC4077}
+		{0DF98396-58BB-433A-A9DE-66555EF32B20} = {FBE0E496-798D-460D-9816-74451C003919}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1D843B36-7F04-4695-864F-D3934B96F746}
+	EndGlobalSection
+EndGlobal

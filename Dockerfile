@@ -1,79 +1,91 @@
-FROM node:18-alpine AS build
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-focal AS base
+WORKDIR /app
+EXPOSE 5001
 
-# Arg
-ARG DEVOPS_ACCOUNT_ID
-ARG AWS_DEFAULT_REGION
+ENV ASPNETCORE_URLS=http://+:5001
 
-# Install
-RUN apk --no-cache add python3 py3-pip
-RUN pip install pip==21.3.1 &&\
-    pip3 install pip==21.3.1 &&\
-    python -m pip install pip==21.3.1 &&\
-    python3 -m pip install pip==21.3.1
-RUN  pip3 install --no-cache-dir awscli
+#copy certificates
+COPY cer /app/cer
 
-# Create app directory
-WORKDIR /usr/src/app
+# Creates a non-root user with an explicit UID and adds permission to access the /app folder
+# For more info, please refer to https://aka.ms/vscode-docker-dotnet-configure-containers
+RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
+USER appuser
 
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-COPY --chown=node:node  package*.json ./
+FROM mcr.microsoft.com/dotnet/sdk:5.0-focal AS build
+WORKDIR /src
+USER root
+##Add nugget packages to image
+RUN apt-get update
+#add curl
+RUN apt-get -y install curl
+RUN apt-get install unzip
+#
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" 
+#
+RUN unzip awscliv2.zip 
+#
+RUN ./aws/install
+#
+RUN apt install wget
+#
+RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+#
+RUN dpkg -i packages-microsoft-prod.deb
+#
+RUN apt-get update
+#
+RUN apt-get install -y apt-transport-https
+#
+RUN apt-get update
+#
+RUN apt-get install -y dotnet-sdk-5.0
+#
+RUN apt-get install -y dotnet-sdk-3.1
+#
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+ARG AWS_DEFAULT_REGION=us-east-2
+ARG AWS_DEFAULT_OUTPUT=JSON
+ARG ENVIRONMENT
+ENV NET_ENVIRONMENT=$ENVIRONMENT
+RUN echo $NET_ENVIRONMENT
+#
+RUN aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
+RUN aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+RUN aws configure set default.region "$AWS_DEFAULT_REGION"
+RUN aws configure set default.output "$AWS_DEFAULT_OUTPUT"
+#
+ENV CODEARTIFACT_AUTH_TOKEN='aws codeartifact get-authorization-token --domain avalsolucionesdigitales --domain-owner 215256885325 --query authorizationToken --output text'
+#
+RUN dotnet nuget add source "https://avalsolucionesdigitales-215256885325.d.codeartifact.us-east-2.amazonaws.com/nuget/nuget-store/v3/index.json" -n "avalsolucionesdigitales/nuget-store" -u "aws" -p "${CODEARTIFACT_AUTH_TOKEN}" --store-password-in-clear-text
+#
+RUN aws codeartifact login --tool dotnet --repository nuget-store --domain avalsolucionesdigitales --domain-owner 215256885325
+RUN dotnet tool install --global AWS.CodeArtifact.NuGet.CredentialProvider --version 1.0.0
+#
+ENV PATH="${PATH}:/root/.dotnet/tools"
+#
+RUN dotnet codeartifact-creds install
+#
+RUN dotnet codeartifact-creds configure set profile default
+#
+COPY [".", "./"]
+# Copy Certificates for novopaymer virtual debit card to physical
+COPY ["cer/virtual-2-physical-dale-key-jwe.pem", "/app/cer/dale"]
+COPY ["cer/virtual-2-physical-dale-key-jws.pem", "/app/cer/dale"]
+COPY ["cer/virtual-2-physical-dale-pub-jwe.pem", "/app/cer/dale"]
+COPY ["cer/virtual-2-physical-dale-pub-jws.pem", "/app/cer/dale"]
+#
+RUN dotnet restore
+#
+COPY . .
+WORKDIR "/src/."
+RUN dotnet build -c Release -o /app/build
 
-RUN ["node", "-e", "\
-    const pkg = JSON.parse(fs.readFileSync('package.json', 'utf-8'));\
-    const pkgLock = JSON.parse(fs.readFileSync('package-lock.json', 'utf-8'));\
-    fs.writeFileSync('package.json', JSON.stringify({ ...pkg, version: '0.0.0' }));\
-    fs.writeFileSync('package-lock.json', JSON.stringify({ ...pkgLock, version: '0.0.0' }));\
-    "]
+FROM build AS publish
+RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
 
-# Config aws-cli
-RUN aws codeartifact login --tool npm --repository npm-private --domain avalsolucionesdigitales --domain-owner $DEVOPS_ACCOUNT_ID --region $AWS_DEFAULT_REGION
-
-# Install app dependencies
-RUN npm install
-
-# Bundle app source
-COPY --chown=node:node . .
-
-# Creates a "dist" folder with the production build
-RUN npm run build
-
-ENV NODE_ENV production
-
-USER node
-
-FROM node:18-alpine AS production
-
-RUN apk update
-RUN export TZDATA_PACKAGE=$(apk search 'tzdata' |awk '/^tzdata-/{print $1; exit}' | sed 's/tzdata-//g') && \
-    apk add --no-cache tzdata=$TZDATA_PACKAGE
-ENV TZ=America/Bogota
-
-# Create app directory
-WORKDIR /usr/src/app
-RUN chown -R node /usr/src/app
-
-# Copy the bundled code from the build stage to the production image
-COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node --from=build /usr/src/app/core/ /usr/src/app/
-COPY --chown=node:node --from=build /usr/src/app/package.json ./
-COPY --chown=node:node --from=build /usr/src/app/src/certchain/ca-certificate-chain.pem ./src/certchain/ca-certificate-chain.pem
-
-# Update certificates
-RUN export CA_CERTIFICATES_PACKAGE=$(apk search 'ca-certificates' |awk '/^ca-certificates-/{print $1; exit}' | sed 's/ca-certificates-//g') && \
-    apk add --no-cache ca-certificates=$CA_CERTIFICATES_PACKAGE
-COPY src/certchain/*  /usr/local/share/ca-certificates/
-RUN update-ca-certificates
-
-
-#migration
-COPY --chown=node:node --from=build /usr/src/app/.cicd/service.entrypoint.sh ./.cicd/service.entrypoint.sh
-COPY --chown=node:node --from=build /usr/src/app/pre-orm.js ./
-
-USER node
-
-EXPOSE 3000
-# Start the server using the production build
-CMD sh -c "sh .cicd/service.entrypoint.sh && npm run typeorm:migrate && node src/main.js"
-
-
-
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "Dale.Services.DebitCard.API.dll", "--environment=Staging"]

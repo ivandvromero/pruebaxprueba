@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
+	  <PackageReference Include="Dale.Extensions.AwsSecretManager" Version="1.0.1" />
+	  <PackageReference Include="Dale.Extensions.Logging" Version="1.0.8" />
+	  <PackageReference Include="Dale.Extensions.MessageBroker.RabbitMQ" Version="2.0.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="5.0.1" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.4">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dale.Services.DebitCard.Application.CQRSCommands\Dale.Services.DebitCard.Application.CQRSCommands.csproj" />
+    <ProjectReference Include="..\Dale.Services.DebitCard.Application.CQRSEvents\Dale.Services.DebitCard.Application.CQRSEvents.csproj" />
+    <ProjectReference Include="..\Dale.Services.DebitCard.Application.CQRSQueries\Dale.Services.DebitCard.Application.CQRSQueries.csproj" />
+    <ProjectReference Include="..\Dale.Services.DebitCard.Domain.Core\Dale.Services.DebitCard.Domain.Core.csproj" />
+    <ProjectReference Include="..\Dale.Services.DebitCard.Infaestructure.Persistence\Dale.Services.DebitCard.Infaestructure.Persistence.csproj" />
+    <ProjectReference Include="..\Dale.Services.DebitCard.Infaestructure\Dale.Services.DebitCard.Infaestructure.csproj" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
+
+
+</Project>

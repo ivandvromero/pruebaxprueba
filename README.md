@@ -1,140 +1,87 @@
-# Account Microservices
+![logo](https://github.com/moondrop-entertainment/k7-Web/blob/master/SupportImages/logo.png)
 
-In this readme you know all inofrmation related with account microservice.
+# k7-Web - Dale! 🚀
 
-* Read this in other languages: [Spanish](README.esp.md).
+What we do every day so you can handle the money at your own pace.
 
-# Table of Contents
-  - [Requirements :page_facing_up:](#Requirements)
-  - [Node package :package: installation](#Node-package-installation)
-  - [Environment Variables :earth_americas:](#Environment-Variables)
-  - [Run :bicyclist: the microservice in local environment ](#Run-the-microservice-in-local-environment)
-  - [Running :bicyclist: tests](#Running-tests)
-  - [Migrations :rocket:](#Migrations)
-  - [Run Docker :anchor:](#Run-Docker)
-  - [Project structure :file_folder:](#Project-structure)
-  - [Good practices :surfer: :sunglasses:](#Good-practices)
+Please read the [CONTRIBUTING.md](https://github.com/moondrop-entertainment/k7-Web/blob/master/CONTRIBUTING.md) for details of our code of conduct, and the process for sending us pull requests.
 
-# <a name="Requirements">Requirements :page_facing_up:</a> 
+## Documentation Git Flow (specification Branchs) and deploy order in each environments. 📦
 
-Before to start the microservice, We recommend having Postgres, Kafka and Redis installed. Either in Docker or the url exposed by dale.
+### GitFlow Model 🤓🛠️
 
-remember to update the paths in the .env file
+![model_git_flow](https://github.com/moondrop-entertainment/k7-Web/blob/master/SupportImages/model_git_flow.png)
 
-install [Node.js](https://nodejs.org/es/ 'Node') :link: on version 16.17.0
+The `bilateral line` indicates that before making the mixture in the respective branch, our branch must be updated.
 
-# <a name="Node-package-installation">Node package :package: installation</a>   
+Example:
 
-Before installing npm dependencies, follow these steps carefully.
+From my local branch I want to upload the changes to the development branch, before doing my push to development, I have to do development overhaul to my branch, to mitigate that I have my branch updated, and that the current changes in the development branch allow you to identify if you have conflicts in the functionalities or code worked
 
-- Install [AWS Command Line Interface version 2](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html 'AWS Command Line Interface') (AWS CLI) :link:.
+##
 
-- In your terminal :computer: execute the command `aws configure` and complete the following data, please request these from the technical lead.
+This GitFlow focused on generating a culture in all the developers and allowing the majority of those involved to know how work works with our branches, mitigate problems due to parallel developments and help us to have a discipline in what we do.
+***The following image specifies how to work on each branch and how would discipline in our daily work.***
 
-```shell
-$ aws configure
-AWS Access Key ID [None]: XXXXXXXXXXX
-AWS Secret Access Key [None]:  XXXXXXXXXXXXXXXXXXXXXX
-Default region name [None]: XXXXXXX
-Default output format [None]: json
-```
+| Branch                     | Description                                                                                                                             |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Master                     | It will be our main branch, it will be the source for stage and production.                                                             |
+| Hotfix                     | It will be our branch to solve all incidents presented in production                                                                    |
+| Release                    | It will be our branch dedicated to qa, it will upload all the changes made in the stable development environments                        |
+| Bugfix                     | It will be our branch where the errors found in the tests in the QA environments will be adjusted                                        |
+| Development                | It will be our branch where it centralizes all the changes made in the branches of each team. (Natural person, Merchant and Debit Card) |
+| Development - Team         | It will be our branch by team, to centralize the changes made by each cell.                                                             |
+| Feature - Team             | It will be our local branch where we will work on the new development.                                                                  |
 
+##
 
-- In your visual studio code terminal :computer: run the command `npm install` in the root of the project.
+> Developer Flow
 
-- If you get any errors with aws:
-run this command first `npm run co:login` and then `npm install`
+***Once having the knowledge in which our work will focus, the normal flow will be as follows.***
 
-# <a name="Environment-Variables">Environment Variables :earth_americas:</a>  
+- You must create a `local copy` of `master branch`. `A branch must be created for each functionality or each History to be developed`.
+- Once the development is finished and the tests are executed `locally`, the changes must be uploaded to the `development branch of your work team` (***natural person, merchant or debit card***).
+- The changes must be uploaded to the `development branch`.
+- The changes must be uploaded to the `release branch`. Once mixed in QA, the testing team will be responsible for certifying that the solution meets the acceptance criteria to be mixed in staging and then production.
+- If QA certifies that the acceptance criteria are met, it will be mixed with `MASTER branch`.
 
-Your team can share these files with you but, if you're starting fresh, you will need to create them yourself:
+## In each mix you should before uploading the changes to the branch must be rebase, and avoid future conflicts.
 
-- Create `dev.env` and `test.env` files in the root directory. Use the [dev.env.template](./dev.env.template) :link: and [test.env.template](./test.env.template) :link: for reference and add your secrets.
+##
 
-# <a name="Run-the-microservice-in-local-environment">Run :bicyclist: the microservice in local environment</a>   
+> Bugfix Flow
 
-- run the following command to start the microservice :computer:
+***Once the information developed in the QA environments has been mixed, if any error is found, the following flow should be followed.***
 
-```shell
-npm run start
-```
+- A local branch must be created with a copy of the branch of Release or QA, This branch will have the name of BugFix + The number of the Bug reported.
+- Once the adjustments are finished, the mixture must be generated with Release or QA for its respective validation
+- If when validating the functionality the incident does not replicate, it will proceed to mix in stage and later to production.
 
-- Run the following command if you want to run the microservice in developer mode :computer:
+## In each mix you should before uploading the changes to the branch must be rebase, and avoid future conflicts.
 
-```shell
-npm run start:dev
-```
+##
 
-- You can access the documentation once the microservice is running through the following urls. [http://localhost:5003/docs]('http://localhost:5003/docs') :link:
+> Hotfix Flow
 
-# <a name="Running-tests">Running :bicyclist: tests</a> 
+***If an error is found in production, the following flow must be followed***
 
-To run the tests, you can run any of the following commands :computer: :
+- If an error is found in production that must be adjusted immediately, a Master copy is created locally
+- Once the development is finished, it must be mixed in QA for their respective validations
+- If QA certifies that the acceptance criteria are met, it will be mixed with `MASTER branch`.
 
-```shell
-npm run test
-```
+## In each mix you should before uploading the changes to the branch must be rebase, and avoid future conflicts.
 
-```shell
-npm run test:cov
-```
+##
 
-```shell
-npm run test:watch
-```
+### Environments Model 🤓🔨
 
-```shell
-npm run test:debug
-```
+![model_environments](https://github.com/moondrop-entertainment/k7-Web/blob/master/SupportImages/model_enviroments.png)
 
-```shell
-npm run test:e2e
-```
+In the previous graphic, the deployment flow per mix in each branch is shown.
 
-# <a name="Migrations">Migrations :rocket:</a> 
+> Environment flow
 
-If the microservice has a database connection configured, the following commands must be executed, depending on your need.
-
-- To apply the migrations to our database, run the following command :computer: :
-
-```shell
-npm run typeorm:migrate
-```
-
-- To perform some rollback of a database migration, run the following command :computer: :
-
-```shell
-npm run typeorm:revert
-```
-
-- To create a new migration, run the following command :computer: :
-
-```shell
-npm run typeorm:generate src/db/migration/name-migration
-```
-- Replace name-migration with the name you want to give the new migration.
-
-# <a name="Run-Docker">Run Docker :anchor:</a>
-
-In progress
-
-# <a name="Project-structure">Project structure :file_folder:</a>  
-
-```sh
-account-nestjs-ms/
-├── src              # In this folder is the application code
-      ├── config
-      ├── constants
-      ├── modules
-      ├── providers
-      ├── utils
-      ├── main.ts
-├── test
-├── dev.env
-├── package.json
-```
-# <a name="Good-practices">Good practices :surfer: :sunglasses:</a> 
-
-Remember that all code you write in this microservice must be in English, including comments.
-
-Do not forget that the description of the commit's must also be in English  and the message must be descriptive with the code that you are going to upload.
+In the development flow the deployments are made in each environments in the following way:
+- The development branch for each team and the development branch will be deployed in the `development` environments
+  - All the changes made in the development that want to pass a quality control, will be deployed in the `QA` environment
+    - Once the tests are executed, it is deployed to the `stage` and to `production`, only the stage binaries will be copied.
